@@ -21,7 +21,7 @@ public class TransactionService {
     }
 
     public Transaction createTransaction(Transaction tx, String merchantCode) {
-        Merchant merchant = merchantRepository.findByMerchantCode(merchantCode)
+        Merchant merchant = merchantRepository.findByCode(merchantCode)
                 .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
 
         tx.setMerchant(merchant);

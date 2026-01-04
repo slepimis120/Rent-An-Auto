@@ -20,7 +20,7 @@ public class MerchantService {
     }
 
     public Merchant create(Merchant merchant) {
-        repository.findByMerchantCode(merchant.getMerchantCode())
+        repository.findByCode(merchant.getCode())
                 .ifPresent(existing -> {
                     throw new IllegalArgumentException("Merchant already exists!");
                 });
@@ -33,7 +33,7 @@ public class MerchantService {
     }
 
     public Merchant getByMerchantCode(String merchantCode) {
-        return repository.findByMerchantCode(merchantCode)
+        return repository.findByCode(merchantCode)
                 .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
     }
 }

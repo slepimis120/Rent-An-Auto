@@ -21,10 +21,10 @@ public class Merchant {
     private UUID id;
 
     @Column(unique = true, nullable = false)
-    private String merchantCode;
+    private String code;
 
     @Column(nullable = false)
-    private String merchantPassword;
+    private String password;
 
     private String name;
     private String successUrl;
