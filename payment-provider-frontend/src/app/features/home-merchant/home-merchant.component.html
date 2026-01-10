@@ -1,0 +1,70 @@
+<div class="container" *ngIf="merchant">
+
+  <button class="logout-btn" (click)="logout()">Logout</button>
+
+  <h1>Merchant Settings</h1>
+
+  <div class="readonly-box">
+    <p><strong>Email:</strong> {{ merchant.email }}</p>
+    <p><strong>Code:</strong> {{ merchant.code }}</p>
+    <p><strong>Role:</strong> {{ merchant.role }}</p>
+  </div>
+
+  <div class="form-group">
+  <div class="form-group">
+    <label>Name</label>
+    <input [(ngModel)]="merchant.name" type="text">
+  </div>
+
+  <div class="form-group">
+    <label>Success URL</label>
+    <input [(ngModel)]="merchant.successUrl" type="text">
+  </div>
+
+  <div class="form-group">
+    <label>Failed URL</label>
+    <input [(ngModel)]="merchant.failedUrl" type="text">
+  </div>
+
+  <div class="form-group">
+    <label>Error URL</label>
+    <input [(ngModel)]="merchant.errorUrl" type="text">
+  </div>
+
+  <div class="form-group">
+    <label>Enabled Payment Methods</label>
+
+    <div class="checkboxes">
+      <label>
+        <input type="checkbox"
+               [checked]="merchant.enabledPaymentMethods.includes('CARD')"
+               (change)="togglePM('CARD', $event)">
+        CARD
+      </label>
+
+      <label>
+        <input type="checkbox"
+               [checked]="merchant.enabledPaymentMethods.includes('QR_CODE')"
+               (change)="togglePM('QR_CODE', $event)">
+        QR CODE
+      </label>
+
+      <label>
+        <input type="checkbox"
+               [checked]="merchant.enabledPaymentMethods.includes('PAYPAL')"
+               (change)="togglePM('PAYPAL', $event)">
+        PAYPAL
+      </label>
+
+      <label>
+        <input type="checkbox"
+               [checked]="merchant.enabledPaymentMethods.includes('CRYPTO')"
+               (change)="togglePM('CRYPTO', $event)">
+        CRYPTO
+      </label>
+    </div>
+  </div>
+
+  <button class="save-btn" (click)="save()">Save</button>
+
+</div>

@@ -1,0 +1,79 @@
+body {
+  background-color: #121212;
+  color: #e2e2e2;
+  font-family: "Inter", sans-serif;
+}
+
+.container {
+  max-width: 600px;
+  margin: 50px auto;
+  background: #1e1e1e;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #bfbfbf;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.save-btn:hover {
+  background-color: #2563eb;
+}
+
+.logout-btn {
+  float: right;
+  background: transparent;
+  border: 1px solid #444;
+  padding: 6px 12px;
+  color: #bbb;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  color: #fff;
+  border-color: #666;
+}

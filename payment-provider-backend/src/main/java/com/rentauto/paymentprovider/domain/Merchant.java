@@ -23,7 +23,7 @@ public class Merchant extends User{
     private String failedUrl;
     private String errorUrl;
 
-    @ElementCollection(targetClass = PaymentMethod.class, fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "merchant_payment_methods", joinColumns = @JoinColumn(name = "merchant_id"))
     @Enumerated(EnumType.STRING)
     private Set<PaymentMethod> enabledPaymentMethods;

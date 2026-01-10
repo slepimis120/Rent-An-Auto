@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/admin/merchants")
+@RequestMapping("/merchants")
 public class MerchantController {
     private final MerchantService merchantService;
 
@@ -24,5 +24,15 @@ public class MerchantController {
     @GetMapping("/{id}")
     public Merchant get(@PathVariable UUID id) {
         return merchantService.getMerchant(id);
+    }
+
+    @GetMapping("/email/{email}")
+    public Merchant getByEmail(@PathVariable String email) {
+        return merchantService.getByEmail(email);
+    }
+
+    @PostMapping()
+    public Merchant updateMerchant(@RequestBody Merchant updatedMerchant) {
+        return merchantService.update(updatedMerchant);
     }
 }
