@@ -1,0 +1,57 @@
+<div class="payment-container" *ngIf="!loading && transaction">
+
+  <h2>Payment for Order #{{ transaction.merchantOrderId }}</h2>
+  <p>Amount: {{ transaction.amount }} {{ transaction.currency }}</p>
+
+  <ng-container [ngSwitch]="transaction.paymentMethod">
+
+    <div *ngSwitchCase="'CARD'" class="card-form">
+      <h3>Pay with Card</h3>
+      <form #cardForm="ngForm" (ngSubmit)="submitCardPayment(cardForm)">
+        <label>
+          Card Number (PAN)
+          <input type="text" name="pan" [(ngModel)]="cardData.pan" required maxlength="19">
+        </label>
+        <label>
+          Security Code (CVV)
+          <input type="text" name="securityCode" [(ngModel)]="cardData.securityCode" required maxlength="4">
+        </label>
+        <label>
+          Card Holder Name
+          <input type="text" name="cardHolder" [(ngModel)]="cardData.cardHolder" required>
+        </label>
+        <label>
+          Expiry (MM/YY)
+          <input type="text" name="expiry" [(ngModel)]="cardData.expiry" required maxlength="5">
+        </label>
+        <button type="submit">Pay {{ transaction.amount }} {{ transaction.currency }}</button>
+      </form>
+    </div>
+
+    <div *ngSwitchCase="'QR_CODE'" class="qr-payment">
+      <h3>Scan QR to Pay</h3>
+      <img *ngIf="transaction.qrCode" [src]="transaction.qrCode" alt="QR Code">
+      <p>Amount: {{ transaction.amount }} {{ transaction.currency }}</p>
+    </div>
+
+    <div *ngSwitchCase="'PAYPAL'" class="paypal-payment">
+      <h3>Pay with PayPal</h3>
+      <button>Redirect to PayPal</button>
+    </div>
+
+    <div *ngSwitchCase="'CRYPTO'" class="crypto-payment">
+      <h3>Pay with Crypto</h3>
+      <p>Amount: {{ transaction.amount }} {{ transaction.currency }}</p>
+      <button>Generate Crypto Payment</button>
+    </div>
+
+    <div *ngSwitchDefault>
+      <p>Payment method not supported.</p>
+    </div>
+
+  </ng-container>
+
+</div>
+
+<div *ngIf="loading">Loading transaction...</div>
+<div *ngIf="errorMessage">{{ errorMessage }}</div>

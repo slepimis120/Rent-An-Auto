@@ -9,7 +9,7 @@ import com.rentauto.paymentprovider.service.TransactionService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/payments")
 public class PaymentInitController {
 
     private final TransactionService service;
@@ -24,7 +24,7 @@ public class PaymentInitController {
     public PaymentInitResponse initPayment(@RequestBody PaymentInitRequest request) {
         Transaction tx = mapper.toEntity(request);
         tx = service.createTransaction(tx, request.merchantCode());
-        String paymentUrl = null;
+        String paymentUrl = "http://localhost:4200/pay/" + tx.getStan();
         return mapper.toInitResponse(tx, paymentUrl);
     }
 
