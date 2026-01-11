@@ -1,0 +1,40 @@
+<div class="header">
+  <div class="logo">🚗 RentAnAuto</div>
+
+  <div class="header-actions">
+    <button title="History">📜</button>
+    <button title="Active rentals">🚘</button>
+    <button class="logout" (click)="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="filter-panel">
+  <input placeholder="Search (BMW, Audi...)" [(ngModel)]="search">
+  <input placeholder="City" [(ngModel)]="city">
+  <input placeholder="Brand" [(ngModel)]="brand">
+
+  <select [(ngModel)]="ordering">
+    <option value="">Sort</option>
+    <option value="price_per_day">Price ↑</option>
+    <option value="-price_per_day">Price ↓</option>
+    <option value="year">Year ↑</option>
+    <option value="-year">Year ↓</option>
+  </select>
+
+  <input type="date" [(ngModel)]="startDate">
+  <input type="date" [(ngModel)]="endDate">
+
+  <button (click)="applyFilters()">Apply</button>
+</div>
+
+<div class="vehicles-grid">
+  <div class="vehicle-card" *ngFor="let v of filteredVehicles">
+    <h3>{{ v.brand }} {{ v.model }}</h3>
+
+    <p><strong>City:</strong> {{ v.city }}</p>
+    <p><strong>Year:</strong> {{ v.year }}</p>
+    <p class="price">{{ v.price_per_day }} € / day</p>
+
+    <button class="reserve-btn">Reserve</button>
+  </div>
+</div>

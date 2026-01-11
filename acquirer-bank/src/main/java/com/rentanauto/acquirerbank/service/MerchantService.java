@@ -7,6 +7,7 @@ import com.rentanauto.acquirerbank.repository.MerchantRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -18,14 +19,14 @@ public class MerchantService {
         Merchant merchant = new Merchant();
         merchant.setName(request.name());
         merchant.setActive(true);
-        merchant.setAcquirerContractId(UUID.randomUUID());
+        merchant.setMerchantApiKey(UUID.randomUUID().toString());
 
         Merchant saved = repository.save(merchant);
 
         return new MerchantCreateResponse(
                 saved.getMerchantId(),
                 saved.getName(),
-                saved.getAcquirerContractId(),
+                saved.getMerchantApiKey(),
                 saved.isActive()
         );
     }
@@ -37,12 +38,12 @@ public class MerchantService {
         return new MerchantCreateResponse(
                 merchant.getMerchantId(),
                 merchant.getName(),
-                merchant.getAcquirerContractId(),
+                merchant.getMerchantApiKey(),
                 merchant.isActive()
         );
     }
 
-    public Iterable<Merchant> getAll() {
+    public List<Merchant> getAll() {
         return repository.findAll();
     }
 }

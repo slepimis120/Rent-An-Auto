@@ -14,14 +14,15 @@ import {CommonModule} from '@angular/common';
 export class HomeMerchantComponent implements OnInit {
 
   merchant: Merchant = {
-    code: '',
+    id: '',
     name: '',
     successUrl: '',
     failedUrl: '',
     errorUrl: '',
     enabledPaymentMethods: [],
     email: '',
-    role: ''
+    role: '',
+    merchantApiKey: ''
   };
   email: string = '';
 

@@ -10,6 +10,5 @@ import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     Optional<Transaction> findByStan(String stan);
-    List<Transaction> findByMerchantCode(String merchantCode);
     List<Transaction> findByPaymentStatus(PaymentStatus paymentStatus);
 }

@@ -13,10 +13,11 @@ public interface TransactionMapper {
     TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "paymentStatus", ignore = true)
-    @Mapping(target = "pspTimestamp", ignore = true)
-    @Mapping(target = "stan", ignore = true)
     @Mapping(target = "merchant", ignore = true)
+    @Mapping(target = "paymentStatus", constant = "PENDING")
+    @Mapping(target = "pspTimestamp", expression = "java(java.time.Instant.now())")
+    @Mapping(target = "stan", ignore = true)
+    @Mapping(target = "externalTransactionId", ignore = true)
     @Mapping(target = "paymentUrl", ignore = true)
     Transaction toEntity(PaymentInitRequest request);
 

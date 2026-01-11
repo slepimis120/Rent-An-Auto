@@ -2,6 +2,7 @@ package com.rentauto.paymentprovider.api.controller;
 
 import com.rentauto.paymentprovider.domain.Merchant;
 import com.rentauto.paymentprovider.service.MerchantService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,22 +18,22 @@ public class MerchantController {
     }
 
     @GetMapping
-    public List<Merchant> getAll() {
-        return merchantService.getAll();
+    public ResponseEntity<List<Merchant>> getAll() {
+        return ResponseEntity.ok(merchantService.getAll());
     }
 
     @GetMapping("/{id}")
-    public Merchant get(@PathVariable UUID id) {
-        return merchantService.getMerchant(id);
+    public ResponseEntity<Merchant> get(@PathVariable UUID id) {
+        return ResponseEntity.ok(merchantService.getMerchant(id));
     }
 
     @GetMapping("/email/{email}")
-    public Merchant getByEmail(@PathVariable String email) {
-        return merchantService.getByEmail(email);
+    public ResponseEntity<Merchant> getByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(merchantService.getByEmail(email));
     }
 
     @PostMapping()
-    public Merchant updateMerchant(@RequestBody Merchant updatedMerchant) {
-        return merchantService.update(updatedMerchant);
+    public ResponseEntity<Merchant> updateMerchant(@RequestBody Merchant updatedMerchant) {
+        return ResponseEntity.ok(merchantService.update(updatedMerchant));
     }
 }

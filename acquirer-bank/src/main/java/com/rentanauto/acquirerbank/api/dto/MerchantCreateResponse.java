@@ -5,6 +5,6 @@ import java.util.UUID;
 public record MerchantCreateResponse(
         UUID merchantId,
         String name,
-        UUID acquirerContractId,
+        String merchantApiKey,
         boolean isActive
 ) {}

@@ -1,0 +1,32 @@
+<div class="auth-page">
+    <div class="auth-card">
+      <h1 class="auth-title">Register</h1>
+  
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" placeholder="JohnDoe" [(ngModel)]="userRequest.username" />
+      </div>
+  
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" placeholder="email@email.com" [(ngModel)]="userRequest.email" />
+      </div>
+  
+      <div class="input-group" >
+        <label>Password</label>
+        <input type="password" placeholder="••••••••••" [(ngModel)]="userRequest.password" />
+      </div>
+  
+      <div class="input-group" >
+        <label>Repeat Password</label>
+        <input type="password" placeholder="••••••••••" [(ngModel)]="repeatPassword" />
+      </div>
+  
+      <p *ngIf="errorMessage" class="error-text">{{ errorMessage }}</p>
+  
+      <button class="btn-primary" (click)="create()">Create Account</button>
+  
+      <button class="btn-outline" (click)="router.navigateByUrl('login')">Back to Login</button>
+    </div>
+  </div>
+  

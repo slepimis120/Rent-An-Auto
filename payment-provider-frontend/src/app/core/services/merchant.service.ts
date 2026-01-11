@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environment/environment';
 
 export interface Merchant {
-  code: string;
+  id: string;
   name: string;
   successUrl: string;
   failedUrl: string;
@@ -12,6 +12,7 @@ export interface Merchant {
   enabledPaymentMethods: string[];
   email: string;
   role: string;
+  merchantApiKey: string;
 }
 
 @Injectable({

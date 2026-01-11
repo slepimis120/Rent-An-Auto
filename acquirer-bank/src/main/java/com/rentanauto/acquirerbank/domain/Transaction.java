@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "TRANSACTIONS")
+@Table(name = "transactions")
 @Getter
 @Setter
 public class Transaction {
@@ -17,27 +17,28 @@ public class Transaction {
     @Column(nullable = false)
     private UUID id;
 
-    @Column(name = "STAN", unique = true)
+    @Column(name = "stan", unique = true)
     private String stan;
 
-    @Column(name = "MERCHANT_ID", nullable = false)
-    private UUID merchantId;
+    @Column(name = "merchant_id", nullable = false)
+    private String merchantId;
 
-    @Column(name = "AMOUNT", nullable = false)
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "CURRENCY", nullable = false)
+    @Column(name = "currency", nullable = false)
     private String currency;
 
-    @Column(name = "PSP_TIMESTAMP")
+    @Column(name = "psp_timestamp")
     private String pspTimestamp;
 
-    @Column(name = "ACQUIRER_TIMESTAMP")
+    @Column(name = "acquirer_timestamp")
     private String acquirerTimestamp;
 
-    @Column(name = "PAYMENT_URL")
+    @Column(name = "payment_url")
     private String paymentUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
     private PaymentStatus paymentStatus;
 }

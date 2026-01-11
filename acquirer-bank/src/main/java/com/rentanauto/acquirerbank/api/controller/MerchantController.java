@@ -5,7 +5,10 @@ import com.rentanauto.acquirerbank.api.dto.MerchantCreateResponse;
 import com.rentanauto.acquirerbank.domain.Merchant;
 import com.rentanauto.acquirerbank.service.MerchantService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -14,17 +17,17 @@ public class MerchantController {
     private final MerchantService service;
 
     @PostMapping
-    public MerchantCreateResponse create(@RequestBody MerchantCreateRequest request) {
-        return service.create(request);
+    public ResponseEntity<MerchantCreateResponse> create(@RequestBody MerchantCreateRequest request) {
+        return ResponseEntity.ok(service.create(request));
     }
 
     @GetMapping()
-    public Iterable<Merchant> getAll() {
-        return service.getAll();
+    public ResponseEntity<List<Merchant>> getAll() {
+        return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
-    public MerchantCreateResponse getById(@PathVariable String id) {
-        return service.getById(id);
+    public ResponseEntity<MerchantCreateResponse> getById(@PathVariable String id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 }
