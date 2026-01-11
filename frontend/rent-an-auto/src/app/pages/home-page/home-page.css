@@ -1,0 +1,90 @@
+/* HEADER */
+.header {
+  height: 64px;
+  background: #111827;
+  color: #fff;
+  padding: 0 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.header-actions button {
+  margin-left: 12px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.logout {
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #dc2626;
+}
+
+/* FILTER PANEL */
+.filter-panel {
+  padding: 24px;
+  background: #f3f4f6;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+
+.filter-panel input,
+.filter-panel select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+}
+
+.filter-panel button {
+  background: #5b6fdc;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* VEHICLES */
+.vehicles-grid {
+  padding: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.vehicle-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.vehicle-card h3 {
+  margin-bottom: 12px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+.reserve-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: #5b6fdc;
+  color: white;
+  cursor: pointer;
+}

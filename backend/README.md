@@ -164,5 +164,13 @@ Omogućava:
 ```bash
 docker compose up --build
 ```
+python3 -m venv venv
+source venv/bin/activate
+pip install django-cors-headers djangorestframework djangorestframework-simplejwt django-filter
+python manage.py makemigrations
+python manage.py migrate
+
+python manage.py runserver 8000
+
 
 ---
