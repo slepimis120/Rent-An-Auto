@@ -1,0 +1,128 @@
+/* PAGE */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #eef2fb, #e3e9f6);
+}
+
+/* CARD */
+.auth-card {
+    width: 420px;
+    padding: 48px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+}
+
+/* TITLE */
+.auth-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 32px;
+    color: #1f2937;
+}
+
+/* INPUT GROUP */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    position: relative; /* za ikonicu */
+}
+
+.input-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #6b7280;
+}
+
+.input-group input {
+    padding: 14px 16px 14px 42px; /* prostor za ikonicu */
+    font-size: 15px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background-color: #f9fafb;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-group input::placeholder {
+    color: #9ca3af;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #5b6fdc;
+    box-shadow: 0 0 0 3px rgba(91, 111, 220, 0.2);
+    background-color: #fff;
+}
+
+/* ICONS */
+.input-group .input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #9ca3af;
+}
+
+/* ERROR */
+.error-text {
+    text-align: center;
+    color: #dc2626;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+/* BUTTONS */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: #5b6fdc;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.btn-primary:hover {
+    background: #4b5fd0;
+}
+
+.btn-outline {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #5b6fdc;
+    color: #5b6fdc;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 18px;
+}
+
+.btn-outline:hover {
+    background: rgba(91, 111, 220, 0.08);
+}
+
+/* LINK */
+.btn-link {
+    background: none;
+    border: none;
+    color: #5b6fdc;
+    font-size: 14px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
