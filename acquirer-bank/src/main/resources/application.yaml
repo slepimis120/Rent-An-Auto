@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: acquirerbank
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_BANK_NAME}?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+
+  sql:
+    init:
+      mode: always
+      platform: mysql
+
+server:
+  port: 9090
