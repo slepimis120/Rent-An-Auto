@@ -1,4 +1,16 @@
 services:
+  acquirer-bank:
+    build:
+      context: ./acquirer-bank
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   payment-provider-frontend:
     build:
       context: ./payment-provider-frontend
@@ -34,10 +46,11 @@ services:
     container_name: payment_mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: payment-provider
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
     healthcheck:
