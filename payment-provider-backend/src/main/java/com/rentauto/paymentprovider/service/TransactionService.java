@@ -1,39 +1,72 @@
 package com.rentauto.paymentprovider.service;
 
+import com.rentauto.paymentprovider.api.dto.PaymentInitRequest;
+import com.rentauto.paymentprovider.api.dto.TransactionCreateRequest;
+import com.rentauto.paymentprovider.api.dto.TransactionCreateResponse;
 import com.rentauto.paymentprovider.domain.Merchant;
 import com.rentauto.paymentprovider.domain.PaymentStatus;
 import com.rentauto.paymentprovider.domain.Transaction;
 import com.rentauto.paymentprovider.repository.MerchantRepository;
 import com.rentauto.paymentprovider.repository.TransactionRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final MerchantRepository merchantRepository;
+    private final BankClient bankClient;
 
-    public TransactionService(TransactionRepository transactionRepository, MerchantRepository merchantRepository) {
-        this.transactionRepository = transactionRepository;
-        this.merchantRepository = merchantRepository;
-    }
-
-    public Transaction createTransaction(Transaction tx, String merchantCode) {
-        Merchant merchant = merchantRepository.findByCode(merchantCode)
+    public Transaction initPaymentProcess(PaymentInitRequest request) {
+        Merchant merchant = merchantRepository.findByMerchantApiKey(request.merchantApiKey())
                 .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
 
+        Transaction tx = new Transaction();
         tx.setMerchant(merchant);
-        tx.setPaymentStatus(PaymentStatus.CREATED);
+        tx.setMerchantOrderId(request.merchantOrderId());
+        tx.setMerchantTimestamp(request.merchantTimestamp());
+        tx.setAmount(request.amount());
+        tx.setCurrency(request.currency());
+        tx.setPaymentMethod(request.paymentMethod());
+        tx.setPaymentStatus(PaymentStatus.PENDING);
         tx.setPspTimestamp(Instant.now());
-        tx.setStan(UUID.randomUUID().toString());
+        tx.setStan(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
 
-        return transactionRepository.save(tx);
+        transactionRepository.save(tx);
+
+        TransactionCreateRequest bankRequest = new TransactionCreateRequest(
+                request.merchantId(),
+                request.amount().toString(),
+                request.currency(),
+                request.merchantId() + "-" + tx.getStan() + "-" + tx.getPspTimestamp(),
+                tx.getPspTimestamp().toString()
+        );
+
+        try {
+            TransactionCreateResponse bankResponse = bankClient.create(bankRequest);
+
+            tx.setExternalTransactionId(bankResponse.payment_id());
+            tx.setPaymentUrl(bankResponse.payment_url());
+
+            return transactionRepository.save(tx);
+        } catch (Exception e) {
+            tx.setPaymentStatus(PaymentStatus.ERROR);
+            transactionRepository.save(tx);
+            throw new RuntimeException("Bank service communication failed: " + e.getMessage());
+        }
+    }
+
+    public void update(Transaction tx) {
+        transactionRepository.save(tx);
     }
 
     public Transaction getTransaction(String stan) {
         return transactionRepository.findByStan(stan)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
+
 }

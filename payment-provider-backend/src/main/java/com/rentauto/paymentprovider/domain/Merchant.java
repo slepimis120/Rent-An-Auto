@@ -15,12 +15,19 @@ import java.util.Set;
 @Setter
 @DiscriminatorValue("MERCHANT")
 public class Merchant extends User{
-    @Column(unique = true, nullable = false)
-    private String code;
+    @Column(name = "merchant_api_key", unique = true, nullable = false)
+    private String merchantApiKey;
 
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "success_url")
     private String successUrl;
+
+    @Column(name = "failed_url")
     private String failedUrl;
+
+    @Column(name = "error_url")
     private String errorUrl;
 
     @ElementCollection(fetch = FetchType.EAGER)

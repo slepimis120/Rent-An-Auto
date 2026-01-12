@@ -1,7 +1,7 @@
 package com.rentanauto.acquirerbank.api.dto;
 
 public record TransactionCreateRequest (
-    String merchant_id,
+    String merchantId,
     String amount,
     String currency,
     String stan,

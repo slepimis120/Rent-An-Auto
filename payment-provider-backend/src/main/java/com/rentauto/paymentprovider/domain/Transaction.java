@@ -25,25 +25,35 @@ public class Transaction {
     @JoinColumn(name = "merchant_id", nullable = false)
     private Merchant merchant;
 
-    @Column(nullable = false)
+    @Column(name = "merchant_order_id", nullable = false)
     private String merchantOrderId;
 
-    @Column(nullable = false)
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(nullable = false)
+    @Column(name = "currency", nullable = false)
     private String currency;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
     private PaymentStatus paymentStatus;
 
+    @Column(name = "merchant_timestamp")
+    private String merchantTimestamp;
+
+    @Column(name = "psp_timestamp")
     private Instant pspTimestamp;
 
     @Column(unique = true)
     private String stan;
+
+    @Column(name = "external_transaction_id")
     private String externalTransactionId;
+
+    @Column(name = "payment_url")
     private String paymentUrl;
 }

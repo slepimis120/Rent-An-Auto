@@ -2,10 +2,10 @@ package com.rentauto.paymentprovider.api.controller;
 
 import com.rentauto.paymentprovider.api.dto.LoginRequest;
 import com.rentauto.paymentprovider.api.dto.RegisterRequest;
+import com.rentauto.paymentprovider.api.dto.RegisterResponse;
 import com.rentauto.paymentprovider.service.JwtService;
 import com.rentauto.paymentprovider.service.MerchantService;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,8 +48,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        merchantService.create(request);
-        return ResponseEntity.ok("Registration successful");
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+        RegisterResponse response = merchantService.create(request);
+        return ResponseEntity.ok(response);
     }
 }

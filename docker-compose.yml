@@ -40,6 +40,8 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
 
   mysql:
     image: mysql:8.0

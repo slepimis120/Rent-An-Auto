@@ -1,9 +1,12 @@
 package com.rentauto.paymentprovider.service;
 
 import com.rentauto.paymentprovider.api.dto.RegisterRequest;
+import com.rentauto.paymentprovider.api.dto.RegisterResponse;
+import com.rentauto.paymentprovider.api.mapper.MerchantMapper;
 import com.rentauto.paymentprovider.domain.Merchant;
 import com.rentauto.paymentprovider.domain.User;
 import com.rentauto.paymentprovider.repository.MerchantRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,20 +14,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class MerchantService {
     private final MerchantRepository repository;
     private final PasswordEncoder passwordEncoder;
-
-    public MerchantService(MerchantRepository repository, PasswordEncoder passwordEncoder) {
-        this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final MerchantMapper merchantMapper;
 
     public List<Merchant> getAll(){
         return repository.findAll();
     }
 
-    public Merchant create(RegisterRequest request) {
+    public RegisterResponse create(RegisterRequest request) {
 
         repository.findByEmail(request.email()).ifPresent(existing -> {
             throw new IllegalArgumentException("Merchant with email already exists!");
@@ -33,10 +33,10 @@ public class MerchantService {
         Merchant merchant = new Merchant();
         merchant.setEmail(request.email());
         merchant.setPassword(passwordEncoder.encode(request.password()));
-        merchant.setCode(generateMerchantCode());
         merchant.setRole(User.Role.ROLE_MERCHANT);
 
-        return repository.save(merchant);
+        Merchant savedMerchant = repository.save(merchant);
+        return merchantMapper.toRegisterResponse(savedMerchant);
     }
 
     public Merchant update(Merchant updatedMerchant) {
@@ -81,6 +81,9 @@ public class MerchantService {
             existingMerchant.getEnabledPaymentMethods().addAll(updatedMerchant.getEnabledPaymentMethods());
         }
 
+        if(updatedMerchant.getMerchantApiKey() != null){
+            existingMerchant.setMerchantApiKey(updatedMerchant.getMerchantApiKey());
+        }
 
         return repository.save(existingMerchant);
     }
@@ -93,14 +96,5 @@ public class MerchantService {
     public Merchant getByEmail(String email) {
         return repository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
-    }
-
-    public Merchant getByMerchantCode(String merchantCode) {
-        return repository.findByCode(merchantCode)
-                .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
-    }
-
-    private String generateMerchantCode() {
-        return "MER-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
     }
 }
