@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -31,12 +32,19 @@ public class TransactionService {
         transaction.setAcquirerTimestamp(Instant.now().toString());
         transaction.setPaymentStatus(PaymentStatus.CREATED);
 
-        String paymentUrl = "https://localhost:4200/pay/" + request.stan();
+        transaction = transactionRepository.save(transaction);
+
+        String paymentUrl = "http://localhost:4200/pay/" + transaction.getId();
         transaction.setPaymentUrl(paymentUrl);
 
         transactionRepository.save(transaction);
 
         return new TransactionCreateResponse(paymentUrl, transaction.getId().toString());
+    }
+
+    public Transaction getTransactionById(String id) {
+        return transactionRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
 
 }

@@ -19,7 +19,7 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(email: string, password: string): Observable<any> {
-    return this.http.post<{ token: string; role: UserRole, email: string; }>(`${environment.apiUrl}/auth/login`, { email, password })
+    return this.http.post<{ token: string; role: UserRole, email: string; }>(`${environment.pspUrl}/auth/login`, { email, password })
       .pipe(
         tap(res => {
           localStorage.setItem(this.email, res.email);
@@ -31,7 +31,7 @@ export class AuthService {
   }
 
   register(email: string, password: string) {
-    return this.http.post(`${environment.apiUrl}/auth/register`, { email, password }, { responseType: 'text' });
+    return this.http.post(`${environment.pspUrl}/auth/register`, { email, password }, { responseType: 'text' });
   }
 
   logout() {

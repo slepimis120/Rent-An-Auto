@@ -23,10 +23,10 @@ export class MerchantService {
   constructor(private http: HttpClient) {}
 
   getMerchantByEmail(email: string): Observable<Merchant> {
-    return this.http.get<Merchant>(`${environment.apiUrl}/merchants/email/${email}`);
+    return this.http.get<Merchant>(`${environment.pspUrl}/merchants/email/${email}`);
   }
 
   updateMerchant(email: string, payload: Merchant): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/merchants`, payload);
+    return this.http.post(`${environment.pspUrl}/merchants`, payload);
   }
 }
