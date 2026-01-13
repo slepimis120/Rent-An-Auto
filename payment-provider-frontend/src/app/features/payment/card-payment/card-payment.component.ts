@@ -1,7 +1,6 @@
-import {Component, OnInit, OnDestroy, Input} from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
@@ -13,7 +12,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 })
 export class CardPaymentComponent implements OnInit, OnDestroy {
   @Input() transactionData: any;
-  transaction: any = null;
+
   paymentData = {
     cardHolderName: '',
     pan: '',
@@ -21,31 +20,36 @@ export class CardPaymentComponent implements OnInit, OnDestroy {
     securityCode: ''
   };
 
-
   panInvalid = false;
   timeExpired = false;
   timeLeft = '15:00';
   private timerSeconds = 900;
   private timerInterval: any;
 
-  constructor(
-    private route: ActivatedRoute,
-    private http: HttpClient,
-    private router: Router
-  ) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    const txId = this.route.snapshot.paramMap.get('id');
-    //this.fetchTransaction(txId);
+    if (this.transactionData && this.transactionData.acquirerTimestamp) {
+      this.calculateRemainingTime(this.transactionData.acquirerTimestamp);
+    } else {
+      this.timerSeconds = 900;
+    }
     this.startTimer();
+    console.log('Podaci o transakciji primljeni:', this.transactionData);
   }
 
-  fetchTransaction(id: string | null) {
-    if (!id) return;
-    this.http.get(`http://localhost:8081/api/transactions/${id}`).subscribe({
-      next: (res) => this.transaction = res,
-      error: (err) => console.error('Transaction not found', err)
-    });
+  calculateRemainingTime(timestamp: string) {
+    const startTime = new Date(timestamp).getTime();
+    const currentTime = new Date().getTime();
+    const diffInSeconds = Math.floor((currentTime - startTime) / 1000);
+
+    const totalSessionDuration = 900;
+    this.timerSeconds = totalSessionDuration - diffInSeconds;
+
+    if (this.timerSeconds <= 0) {
+      this.timerSeconds = 0;
+      this.timeExpired = true;
+    }
   }
 
   startTimer() {
@@ -62,12 +66,27 @@ export class CardPaymentComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  onPanInput(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+
+    if (value.length > 16) {
+      value = value.substring(0, 16);
+    }
+
+    const formattedValue = value.match(/.{1,4}/g)?.join(' ') || '';
+
+    this.paymentData.pan = formattedValue;
+    event.target.value = formattedValue;
+
+    this.validatePan();
+  }
+
   validatePan() {
     let sum = 0;
     let shouldDouble = false;
     const pan = this.paymentData.pan.replace(/\s+/g, '');
 
-    if (pan.length < 13) {
+    if (pan.length < 13 || pan.length > 16) {
       this.panInvalid = true;
       return;
     }
@@ -84,20 +103,41 @@ export class CardPaymentComponent implements OnInit, OnDestroy {
     this.panInvalid = !(sum % 10 === 0);
   }
 
+  onExpiryInput(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+
+    if (value.length >= 2) {
+      const month = parseInt(value.substring(0, 2));
+      if (month < 1 || month > 12) {
+        value = value.substring(0, 1);
+      }
+    }
+
+    let formattedValue = value;
+    if (value.length > 2) {
+      formattedValue = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+
+    this.paymentData.expiryDate = formattedValue;
+    event.target.value = formattedValue;
+  }
+
+
   submitPayment() {
     if (this.panInvalid || this.timeExpired) return;
 
     const payload = {
       ...this.paymentData,
-      transactionId: this.transaction.id
+      transactionId: this.transactionData.id
     };
 
-    this.http.post('http://localhost:8081/api/transactions/pay', payload).subscribe({
+    this.http.post('http://localhost:9090/transactions/pay', payload).subscribe({
       next: (res: any) => {
         window.location.href = res.redirectUrl;
       },
       error: (err) => {
-        alert('Payment failed or error occurred');
+        console.error('Plaćanje nije uspelo:', err);
+        alert('Došlo je do greške prilikom obrade kartice.');
       }
     });
   }
