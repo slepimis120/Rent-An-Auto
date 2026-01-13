@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="sr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Greška</title>
+    <link rel="stylesheet" href="./error.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="card">
+        <div class="icon warn">⚠</div>
+
+        <h1>Došlo je do greške</h1>
+        <p class="muted">Trenutno ne možemo potvrditi status plaćanja.</p>
+
+        <div class="info">
+          <div class="row">
+            <span>Error code</span><strong id="code">UNKNOWN</strong>
+          </div>
+          <div class="row">
+            <span>Payment ID</span><strong id="paymentId">-</strong>
+          </div>
+          <div class="row">
+            <span>Order ID</span><strong id="orderId">-</strong>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="btn primary" href="./success.html">Nazad</a>
+          <a class="btn ghost" href="./failed.html">Simuliraj FAIL</a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const p = new URLSearchParams(location.search);
+      ["paymentId", "orderId", "code"].forEach((k) => {
+        const v = p.get(k);
+        if (v) document.getElementById(k).textContent = v;
+      });
+    </script>
+  </body>
+</html>

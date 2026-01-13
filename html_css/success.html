@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="sr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plaćanje uspešno</title>
+    <link rel="stylesheet" href="./success.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="card">
+        <div class="icon success">✓</div>
+
+        <h1>Plaćanje uspešno</h1>
+        <p class="muted">
+          Transakcija je uspešno završena. Sačuvajte podatke kao referencu.
+        </p>
+
+        <div class="info">
+          <div class="row">
+            <span>Payment ID</span>
+            <strong id="paymentId">-</strong>
+          </div>
+          <div class="row">
+            <span>Order ID</span>
+            <strong id="orderId">-</strong>
+          </div>
+          <div class="row">
+            <span>Status</span>
+            <strong class="badge ok">SUCCESS</strong>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="btn primary" id="btnHome" href="./success.html"
+            >Nazad (demo)</a
+          >
+          <a class="btn ghost" id="btnFail" href="./failed.html"
+            >Simuliraj FAIL</a
+          >
+          <a class="btn ghost" id="btnError" href="./error.html"
+            >Simuliraj ERROR</a
+          >
+        </div>
+
+        <p class="tiny muted">
+          Test URL: <code>?paymentId=123&orderId=ABC</code>
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const paymentId = params.get("paymentId");
+      const orderId = params.get("orderId");
+
+      if (paymentId)
+        document.getElementById("paymentId").textContent = paymentId;
+      if (orderId) document.getElementById("orderId").textContent = orderId;
+
+      const qs = params.toString();
+      document.getElementById("btnFail").href = qs
+        ? `./failed.html?${qs}&reason=DECLINED`
+        : `./failed.html?reason=DECLINED`;
+
+      document.getElementById("btnError").href = qs
+        ? `./error.html?${qs}&code=TIMEOUT`
+        : `./error.html?code=TIMEOUT`;
+    </script>
+  </body>
+</html>

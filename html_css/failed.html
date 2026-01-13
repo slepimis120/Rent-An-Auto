@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="sr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plaćanje neuspešno</title>
+    <link rel="stylesheet" href="./failed.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="card">
+        <div class="icon failed">!</div>
+
+        <h1>Plaćanje neuspešno</h1>
+        <p class="muted">
+          Transakcija je odbijena ili je korisnik prekinuo proces.
+        </p>
+
+        <div class="info">
+          <div class="row">
+            <span>Reason</span><strong id="reason">DECLINED</strong>
+          </div>
+          <div class="row">
+            <span>Payment ID</span><strong id="paymentId">-</strong>
+          </div>
+          <div class="row">
+            <span>Order ID</span><strong id="orderId">-</strong>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="btn primary" href="./success.html">Nazad</a>
+          <a class="btn ghost" href="./error.html">Simuliraj ERROR</a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const p = new URLSearchParams(location.search);
+      ["paymentId", "orderId", "reason"].forEach((k) => {
+        const v = p.get(k);
+        if (v) document.getElementById(k).textContent = v;
+      });
+    </script>
+  </body>
+</html>
