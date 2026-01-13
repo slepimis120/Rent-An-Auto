@@ -5,6 +5,9 @@ import {RegisterPage} from "./pages/register-page/register-page";
 import { HomePage } from './pages/home-page/home-page';
 import { ActiveReservation } from './pages/active-reservation/active-reservation';
 import { ReservationHistory } from './pages/reservation-history/reservation-history';
+import { PaymentFailed } from './pages/payment-failed/payment-failed';
+import { PaymentSuccess } from './pages/payment-success/payment-success';
+import { PaymentError } from './pages/payment-error/payment-error';
 
 const routes: Routes = [
   { path: 'login', component: LoginPage },
@@ -12,6 +15,9 @@ const routes: Routes = [
   { path: 'home', component: HomePage },
   { path: 'active', component: ActiveReservation },
   { path: 'history', component: ReservationHistory },
+  { path: 'payment/success', component: PaymentSuccess },
+  { path: 'payment/failed', component: PaymentFailed },
+  { path: 'payment/error', component: PaymentError },
   { path: '**', redirectTo: 'login' }
 ];
 

@@ -1,0 +1,31 @@
+<div class="payment-page" *ngIf="!loading && payment">
+
+    <h1>✅ Payment Status</h1>
+  
+    <div class="box">
+      <p><strong>Order:</strong> {{ payment.merchantOrderId }}</p>
+      <p><strong>Amount:</strong> {{ payment.amount }} {{ payment.currency }}</p>
+      <p><strong>Method:</strong> {{ payment.paymentMethod }}</p>
+      <p><strong>Status:</strong> {{ payment.paymentStatus }}</p>
+      <p><strong>STAN:</strong> {{ payment.stan }}</p>
+    </div>
+  
+    <p class="success" *ngIf="payment.paymentStatus === 'SUCCESS'">
+      Payment successful. Reservation confirmed.
+    </p>
+  
+    <p class="pending" *ngIf="payment.paymentStatus === 'PENDING'">
+      Payment is still being processed.
+    </p>
+  
+    <p class="error" *ngIf="payment.paymentStatus !== 'SUCCESS' && payment.paymentStatus !== 'PENDING'">
+      Payment failed or was rejected.
+    </p>
+  
+    <button (click)="goHome()">Go to Home</button>
+  </div>
+  
+  <div class="payment-page" *ngIf="loading">
+    <h2>Loading payment...</h2>
+  </div>
+  

@@ -11,6 +11,9 @@ import {FormsModule} from "@angular/forms";
 import { CommonModule } from '@angular/common';
 import { ReservationHistory } from './pages/reservation-history/reservation-history';
 import { ActiveReservation } from './pages/active-reservation/active-reservation';
+import { PaymentSuccess } from './pages/payment-success/payment-success';
+import { PaymentFailed } from './pages/payment-failed/payment-failed';
+import { PaymentError } from './pages/payment-error/payment-error';
 
 
 @NgModule({
@@ -20,7 +23,10 @@ import { ActiveReservation } from './pages/active-reservation/active-reservation
     RegisterPage,
     HomePage,
     ReservationHistory,
-    ActiveReservation
+    ActiveReservation,
+    PaymentSuccess,
+    PaymentFailed,
+    PaymentError
   ],
   imports: [
     BrowserModule,
