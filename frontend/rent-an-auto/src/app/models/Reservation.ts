@@ -3,4 +3,4 @@ interface Reservation {
     vehicle: number; // ID vozila
     start_date: string;
     end_date: string;
-  }
+  }// ⛔ privremeno — kasnije iz auth servisa
