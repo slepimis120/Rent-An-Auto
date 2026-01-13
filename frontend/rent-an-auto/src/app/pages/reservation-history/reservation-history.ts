@@ -1,7 +1,8 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
-import { lastValueFrom } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reservation-history',
@@ -11,9 +12,7 @@ import { lastValueFrom } from 'rxjs';
 })
 export class ReservationHistory implements OnInit {
 
-  reservations: any[] = [];
-  userReservations: any[] = [];
-  reservationsWithVehicle: any[] = [];
+  reservationsWithVehicle$!: Observable<any[]>;
   currentUserId!: number;
 
   constructor(
@@ -29,7 +28,29 @@ export class ReservationHistory implements OnInit {
 
     this.currentUserId = userId;
 
-    this.loadReservations();
+    this.reservationsWithVehicle$ = this.http
+      .get<any[]>('http://localhost:8000/api/reservations/')
+      .pipe(
+        map(reservations =>
+          reservations.filter(
+            r => r.renter_id.toString() === this.currentUserId.toString()
+          )
+        ),
+        switchMap(userReservations =>
+          forkJoin(
+            userReservations.map(r =>
+              this.http
+                .get<any>(`http://localhost:8000/api/vehicles/${r.vehicle}`)
+                .pipe(
+                  map(vehicle => ({
+                    ...r,
+                    vehicle
+                  }))
+                )
+            )
+          )
+        )
+      );
   }
 
   getUserIdFromToken(): number | null {
@@ -41,48 +62,6 @@ export class ReservationHistory implements OnInit {
       return payload.user_id;
     } catch {
       return null;
-    }
-  }
-
-  loadReservations() {
-    this.http
-      .get<any[]>('http://localhost:8000/api/reservations/')
-      .subscribe(async res => {
-        this.reservations = res;
-        this.filterByUser();
-        await this.loadVehicleDetails();
-      });
-  }
-
-  filterByUser() {
-    this.userReservations = this.reservations.filter(
-      r => r.renter_id.toString() === this.currentUserId.toString()
-    );
-  }
-
-  isPast(r: any): boolean {
-    return new Date(r.end_date) < new Date();
-  }
-
-  isActive(r: any): boolean {
-    const today = new Date();
-    return new Date(r.start_date) <= today && new Date(r.end_date) >= today;
-  }
-
-  async loadVehicleDetails() {
-    console.log
-    const vehicleRequests = this.userReservations.map(r =>
-      lastValueFrom(this.http.get<any>(`http://localhost:8000/api/vehicles/${r.vehicle_id}`))
-    );
-
-    try {
-      const vehicles = await Promise.all(vehicleRequests);
-      this.reservationsWithVehicle = this.userReservations.map((r, i) => ({
-        ...r,
-        vehicle: vehicles[i]
-      }));
-    } catch (err) {
-      console.error('Error loading vehicles', err);
     }
   }
 

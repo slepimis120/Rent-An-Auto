@@ -1,1 +1,29 @@
-<p>active-reservation works!</p>
+<div class="header">
+    <div class="logo" (click)="home()">🚗 RentAnAuto</div>
+  
+    <div class="header-actions">
+      <button title="History" (click)="history()">📜</button>
+      <button title="Active rentals" (click)="activeReservations()">🚘</button>
+      <button class="logout" (click)="logout()">Logout</button>
+    </div>
+  </div>
+  
+  <div class="active-page">
+    <h2>🚘 Active Reservations</h2>
+  
+    <div class="reservations-grid">
+      <div
+        class="reservation-card"
+        *ngFor="let r of activeReservationsWithVehicle$ | async"
+      >
+        <h3>🚗 {{ r.vehicle.make }} {{ r.vehicle.model }}</h3>
+        <p><strong>Year:</strong> {{ r.vehicle.year }}</p>
+        <p><strong>From:</strong> {{ r.start_date }}</p>
+        <p><strong>To:</strong> {{ r.end_date }}</p>
+        <p class="price">
+          {{ r.vehicle.price_per_day }} € / day
+        </p>
+      </div>
+    </div>
+  </div>
+  
