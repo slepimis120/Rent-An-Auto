@@ -4,6 +4,7 @@ import com.rentauto.paymentprovider.api.dto.PaymentInitRequest;
 import com.rentauto.paymentprovider.api.dto.TransactionCreateRequest;
 import com.rentauto.paymentprovider.api.dto.TransactionCreateResponse;
 import com.rentauto.paymentprovider.domain.Merchant;
+import com.rentauto.paymentprovider.domain.PaymentMethod;
 import com.rentauto.paymentprovider.domain.PaymentStatus;
 import com.rentauto.paymentprovider.domain.Transaction;
 import com.rentauto.paymentprovider.repository.MerchantRepository;
@@ -21,7 +22,7 @@ public class TransactionService {
     private final MerchantRepository merchantRepository;
     private final BankClient bankClient;
 
-    public Transaction initPaymentProcess(PaymentInitRequest request) {
+    public Transaction initPaymentProcess(PaymentInitRequest request, PaymentMethod method) {
         Merchant merchant = merchantRepository.findByMerchantApiKey(request.merchantApiKey())
                 .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
 
@@ -31,10 +32,11 @@ public class TransactionService {
         tx.setMerchantTimestamp(request.merchantTimestamp());
         tx.setAmount(request.amount());
         tx.setCurrency(request.currency());
-        tx.setPaymentMethod(request.paymentMethod());
+        tx.setPaymentMethod(method);
         tx.setPaymentStatus(PaymentStatus.PENDING);
         tx.setPspTimestamp(Instant.now());
-        tx.setStan(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        String generatedStan = "STAN-" + UUID.randomUUID().toString().substring(0, 8);
+        tx.setStan(generatedStan);
 
         transactionRepository.save(tx);
 
@@ -65,7 +67,7 @@ public class TransactionService {
     }
 
     public Transaction getTransaction(String stan) {
-        return transactionRepository.findByStan(stan)
+        return transactionRepository.findByStan("STAN-" + stan)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
 

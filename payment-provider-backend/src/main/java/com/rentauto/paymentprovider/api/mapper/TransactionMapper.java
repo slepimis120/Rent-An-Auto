@@ -2,6 +2,7 @@ package com.rentauto.paymentprovider.api.mapper;
 
 import com.rentauto.paymentprovider.api.dto.PaymentInitRequest;
 import com.rentauto.paymentprovider.api.dto.PaymentInitResponse;
+import com.rentauto.paymentprovider.api.dto.PaymentMethodResponse;
 import com.rentauto.paymentprovider.api.dto.PaymentStatusResponse;
 import com.rentauto.paymentprovider.domain.Transaction;
 import org.mapstruct.Mapper;
@@ -29,4 +30,8 @@ public interface TransactionMapper {
     @Mapping(target = "stan", source = "transaction.stan")
     @Mapping(target = "status", source = "transaction.paymentStatus")
     PaymentStatusResponse toStatusResponse(Transaction transaction);
+
+    @Mapping(target = "stan", source = "transaction.stan")
+    @Mapping(target = "method", source = "transaction.paymentMethod")
+    PaymentMethodResponse toMethodResponse(Transaction transaction);
 }
