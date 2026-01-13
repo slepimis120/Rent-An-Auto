@@ -1,0 +1,27 @@
+<div class="header">
+    <div class="logo" (click)="home()">🚗 RentAnAuto</div>
+  
+    <div class="header-actions">
+      <button title="History" (click)="history()">📜</button>
+      <button title="Active rentals" (click)="activeReservations()">🚘</button>
+      <button class="logout" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+
+<div class="history-page">
+  <h2>📜 My Reservations</h2>
+  
+  <div class="reservations-grid">
+    <div
+      class="reservation-card"
+      *ngFor="let r of reservationsWithVehicle"
+    >
+      <h3>🚗 {{ r.vehicle.make }} {{ r.vehicle.model }}</h3>
+      <p><strong>Year:</strong> {{ r.vehicle.year }}</p>
+      <p><strong>From:</strong> {{ r.start_date }}</p>
+      <p><strong>To:</strong> {{ r.end_date }}</p>
+      <p><strong>Price:</strong> ${{ r.vehicle.price_per_day }}/day</p>
+    </div>
+  </div>
+  
