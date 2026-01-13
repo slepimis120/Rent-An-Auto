@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
@@ -6,32 +6,42 @@ import {
   HttpInterceptor
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {environment} from "../../environment/environment";
+import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../environment/environment';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
 
-  constructor() {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-      const token = localStorage.getItem(environment.jwtKeyName);
+  intercept(
+    request: HttpRequest<unknown>,
+    next: HttpHandler
+  ): Observable<HttpEvent<unknown>> {
 
-      const excludedUrls = [
-          "/auth",
-      ];
-
-      if (excludedUrls.some(url => request.url.includes(url)) && token == null) {
-          return next.handle(request);
-      }
-
-      if (token) {
-          request = request.clone({
-              setHeaders: {
-                  Authorization: `Bearer ${token}`
-              }
-          });
-      }
-
+    // ⛔ SERVER → NE DIRAJ localStorage
+    if (!isPlatformBrowser(this.platformId)) {
       return next.handle(request);
+    }
+
+    const token = localStorage.getItem(environment.jwtKeyName);
+
+    const excludedUrls = ['/auth'];
+
+    if (excludedUrls.some(url => request.url.includes(url))) {
+      return next.handle(request);
+    }
+
+    if (token) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
+
+    return next.handle(request);
   }
 }

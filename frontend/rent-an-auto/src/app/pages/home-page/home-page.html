@@ -1,19 +1,30 @@
 <div class="header">
-  <div class="logo">🚗 RentAnAuto</div>
+  <div class="logo" (click)="home()">🚗 RentAnAuto</div>
 
   <div class="header-actions">
-    <button title="History">📜</button>
-    <button title="Active rentals">🚘</button>
+    <button title="History" (click)="history()">📜</button>
+    <button title="Active rentals" (click)="activeReservations()">🚘</button>
     <button class="logout" (click)="logout()">Logout</button>
   </div>
 </div>
 
 <div class="filter-panel">
-  <input placeholder="Search (BMW, Audi...)" [(ngModel)]="search">
-  <input placeholder="City" [(ngModel)]="city">
-  <input placeholder="Brand" [(ngModel)]="brand">
+  <input
+    placeholder="Search (BMW, Audi...)"
+    (input)="search$.next($any($event.target).value)"
+  />
 
-  <select [(ngModel)]="ordering">
+  <input
+    placeholder="City"
+    (input)="city$.next($any($event.target).value)"
+  />
+
+  <input
+    placeholder="Brand"
+    (input)="brand$.next($any($event.target).value)"
+  />
+
+  <select (change)="ordering$.next($any($event.target).value)">
     <option value="">Sort</option>
     <option value="price_per_day">Price ↑</option>
     <option value="-price_per_day">Price ↓</option>
@@ -21,20 +32,32 @@
     <option value="-year">Year ↓</option>
   </select>
 
-  <input type="date" [(ngModel)]="startDate">
-  <input type="date" [(ngModel)]="endDate">
-
-  <button (click)="applyFilters()">Apply</button>
+  <input type="date" (change)="startDate$.next($any($event.target).value)" />
+  <input type="date" (change)="endDate$.next($any($event.target).value)" />
 </div>
 
 <div class="vehicles-grid">
-  <div class="vehicle-card" *ngFor="let v of filteredVehicles">
+  <div class="vehicle-card" *ngFor="let v of filteredVehicles$ | async">
     <h3>{{ v.brand }} {{ v.model }}</h3>
 
     <p><strong>City:</strong> {{ v.city }}</p>
     <p><strong>Year:</strong> {{ v.year }}</p>
     <p class="price">{{ v.price_per_day }} € / day</p>
 
-    <button class="reserve-btn">Reserve</button>
+    <button class="reserve-btn" (click)="openPayment(v)">
+      Reserve
+    </button>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-backdrop" *ngIf="showPaymentModal">
+  <div class="payment-modal">
+    <h3>Choose payment method</h3>
+
+    <button (click)="pay('CARD')">💳 Pay by Card</button>
+    <button (click)="pay('QR')">📱 Pay with QR</button>
+
+    <button class="close" (click)="closePayment()">Cancel</button>
   </div>
 </div>
