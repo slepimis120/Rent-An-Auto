@@ -71,4 +71,9 @@ public class TransactionService {
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
 
+    public Transaction getTransactionById(String id) {
+        return transactionRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+    }
+
 }
