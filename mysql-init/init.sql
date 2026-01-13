@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS merchant_payment_methods (
     FOREIGN KEY (merchant_id) REFERENCES users(id)
     );
 
-SET @merchant_id = UUID();
+SET @merchant_id = 'fb440d26-f064-11f0-b818-b262890194ad';
 
 INSERT INTO users (id, type, email, password, role, name, success_url, failed_url, error_url, merchant_api_key)
 VALUES (
@@ -76,7 +76,7 @@ VALUES (
        'ROLE_MERCHANT',
        'Rent-A-Car Global',
        'http://localhost:4200/payment/success',
-       'http://localhost:4200/payment/fail',
+       'http://localhost:4200/payment/failed',
        'http://localhost:4200/payment/error',
        'GqcexvV7aTS0ekMCoULOOovruWz9S3eE'
 );

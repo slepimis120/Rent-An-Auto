@@ -1,5 +1,7 @@
 package com.rentanauto.acquirerbank.api.controller;
 
+import com.rentanauto.acquirerbank.api.dto.CardPaymentRequest;
+import com.rentanauto.acquirerbank.api.dto.CardPaymentResponse;
 import com.rentanauto.acquirerbank.api.dto.TransactionCreateRequest;
 import com.rentanauto.acquirerbank.api.dto.TransactionCreateResponse;
 import com.rentanauto.acquirerbank.domain.Transaction;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/transactions")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4300")
 public class TransactionController {
     private final TransactionService service;
 
@@ -26,5 +28,10 @@ public class TransactionController {
     public ResponseEntity<Transaction> getTransactionById(@PathVariable String id) {
         Transaction transaction = service.getTransactionById(id);
         return ResponseEntity.ok(transaction);
+    }
+
+    @PostMapping("/pay")
+    public ResponseEntity<CardPaymentResponse> processPayment(@RequestBody CardPaymentRequest request) {
+        return ResponseEntity.ok(service.processPayment(request));
     }
 }

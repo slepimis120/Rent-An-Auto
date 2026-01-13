@@ -21,4 +21,9 @@ public class QrCodePaymentPlugin implements PaymentPlugin {
     public PaymentInitResponse processPayment(PaymentInitRequest request) {
         return null;
     }
+
+    @Override
+    public String handleCallback(Map<String, String> params) {
+        return "";
+    }
 }
