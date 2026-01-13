@@ -12,11 +12,9 @@ import { map } from 'rxjs/operators';
 })
 export class HomePage implements OnInit {
 
-  // DATA STREAMS
-  private vehicles$ = new BehaviorSubject<Vehicle[]>([]);
-  private reservations$ = new BehaviorSubject<Reservation[]>([]);
+  private vehicles$ = new BehaviorSubject<any[]>([]);
+  private reservations$ = new BehaviorSubject<any[]>([]);
 
-  // FILTER STREAMS
   search$ = new BehaviorSubject<string>('');
   city$ = new BehaviorSubject<string>('');
   brand$ = new BehaviorSubject<string>('');
@@ -24,7 +22,6 @@ export class HomePage implements OnInit {
   startDate$ = new BehaviorSubject<string>('');
   endDate$ = new BehaviorSubject<string>('');
 
-  // FINAL STREAM ZA HTML
   filteredVehicles$ = combineLatest([
     this.vehicles$,
     this.reservations$,
@@ -58,11 +55,10 @@ export class HomePage implements OnInit {
       }
 
       if (ordering) {
-        const field = ordering.replace('-', '') as keyof Vehicle;
+        const field = ordering.replace('-', '');
         const dir = ordering.startsWith('-') ? -1 : 1;
-
         filtered = filtered.sort((a, b) =>
-          (a[field] as any) > (b[field] as any) ? dir : -dir
+          a[field] > b[field] ? dir : -dir
         );
       }
 
@@ -83,6 +79,9 @@ export class HomePage implements OnInit {
     })
   );
 
+  showPaymentModal = false;
+  selectedVehicle: any;
+
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -99,24 +98,54 @@ export class HomePage implements OnInit {
     });
 
     this.http
-      .get<Vehicle[]>('http://127.0.0.1:8000/api/vehicles/', { headers })
+      .get<any[]>('http://127.0.0.1:8000/api/vehicles/', { headers })
       .subscribe(v => this.vehicles$.next(v));
 
     this.http
-      .get<Reservation[]>('http://127.0.0.1:8000/api/reservations/', { headers })
+      .get<any[]>('http://127.0.0.1:8000/api/reservations/', { headers })
       .subscribe(r => this.reservations$.next(r));
+  }
+
+  openPayment(vehicle: any) {
+    this.selectedVehicle = vehicle;
+    this.showPaymentModal = true;
+  }
+
+  closePayment() {
+    this.showPaymentModal = false;
+  }
+
+  pay(method: 'CARD' | 'QR') {
+    const body = {
+      merchantId: 'fb440d26-f064-11f0-b818-b262890194ad',
+      merchantApiKey: 'GqcexvV7aTS0ekMCoULOOovruWz9S3eE',
+      merchantOrderId: 'ORDER-' + crypto.randomUUID(),
+      merchantTimestamp: new Date().toISOString(),
+      amount: this.selectedVehicle.price_per_day,
+      currency: 'EUR',
+      paymentMethod: method
+    };
+
+    this.http
+      .post<any>('http://localhost:8080/payments/card/process', body)
+      .subscribe(res => {
+        window.location.href = res.paymentUrl;
+      });
   }
 
   logout() {
     localStorage.clear();
     window.location.href = '/login';
   }
+
   history() {
     window.location.href = '/history';
   }
+
   activeReservations() {
     window.location.href = '/active';
   }
+
   home() {
     window.location.href = '/home';
   }

@@ -32,28 +32,32 @@
     <option value="-year">Year ↓</option>
   </select>
 
-  <input
-    type="date"
-    (change)="startDate$.next($any($event.target).value)"
-  />
-
-  <input
-    type="date"
-    (change)="endDate$.next($any($event.target).value)"
-  />
+  <input type="date" (change)="startDate$.next($any($event.target).value)" />
+  <input type="date" (change)="endDate$.next($any($event.target).value)" />
 </div>
 
 <div class="vehicles-grid">
-  <div
-    class="vehicle-card"
-    *ngFor="let v of filteredVehicles$ | async"
-  >
+  <div class="vehicle-card" *ngFor="let v of filteredVehicles$ | async">
     <h3>{{ v.brand }} {{ v.model }}</h3>
 
     <p><strong>City:</strong> {{ v.city }}</p>
     <p><strong>Year:</strong> {{ v.year }}</p>
     <p class="price">{{ v.price_per_day }} € / day</p>
 
-    <button class="reserve-btn">Reserve</button>
+    <button class="reserve-btn" (click)="openPayment(v)">
+      Reserve
+    </button>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-backdrop" *ngIf="showPaymentModal">
+  <div class="payment-modal">
+    <h3>Choose payment method</h3>
+
+    <button (click)="pay('CARD')">💳 Pay by Card</button>
+    <button (click)="pay('QR')">📱 Pay with QR</button>
+
+    <button class="close" (click)="closePayment()">Cancel</button>
   </div>
 </div>

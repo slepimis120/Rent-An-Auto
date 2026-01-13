@@ -70,6 +70,7 @@ export class ReservationHistory implements OnInit {
   }
 
   async loadVehicleDetails() {
+    console.log
     const vehicleRequests = this.userReservations.map(r =>
       lastValueFrom(this.http.get<any>(`http://localhost:8000/api/vehicles/${r.vehicle_id}`))
     );
