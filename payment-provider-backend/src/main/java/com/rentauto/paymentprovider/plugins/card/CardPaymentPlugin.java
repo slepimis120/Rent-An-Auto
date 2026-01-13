@@ -50,7 +50,7 @@ public class CardPaymentPlugin implements PaymentPlugin {
                 ? tx.getMerchant().getSuccessUrl()
                 : tx.getMerchant().getFailedUrl();
 
-        return redirectUrl + "?id=" + globalId;
+        return redirectUrl + "?id=" + tx.getId();
     }
 
 }
