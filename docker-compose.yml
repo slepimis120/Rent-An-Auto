@@ -13,7 +13,7 @@ services:
 
   payment-provider-frontend:
     build:
-      context: ./payment-provider-frontend
+      context: ./payment-provider/payment-provider-frontend
       dockerfile: Dockerfile
     ports:
       - "4300:80"
@@ -22,7 +22,7 @@ services:
 
   payment-provider-backend:
     build:
-      context: ./payment-provider-backend
+      context: ./payment-provider/payment-provider-backend
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
@@ -34,10 +34,10 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ./rent-an-auto/rent-an-auto-backend
       dockerfile: Dockerfile
     volumes:
-      - ./backend:/app
+      - ./rent-an-auto/rent-an-auto-backend:/app
     ports:
       - "8000:8000"
     environment:
@@ -52,7 +52,7 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./mysql-init:/docker-entrypoint-initdb.d
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
     healthcheck:
