@@ -42,6 +42,11 @@ services:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   rent-an-auto-frontend:
     build:
