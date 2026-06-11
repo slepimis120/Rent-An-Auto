@@ -1,6 +1,9 @@
 package com.rentanauto.acquirerbank.service;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -8,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,8 +37,16 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CardHolderRepository cardHolderRepository;
     private final RestTemplate restTemplate = new RestTemplate();
+    private static final String CVK_SECRET = "secret-bank-key";
+    private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
+
 
     public TransactionCreateResponse createTransaction(TransactionCreateRequest request) {
+        log.info(
+            "Transaction created. MerchantId={}, Amount={}",
+            request.merchantId(),
+            request.amount()
+        );
         Transaction existing = transactionRepository.findByStan(request.stan());
         if (existing != null) {
             return new TransactionCreateResponse(existing.getPaymentUrl(), existing.getId().toString());
@@ -62,15 +78,28 @@ public class TransactionService {
 
     public CardPaymentResponse processPayment(CardPaymentRequest request) {
 
+        log.info("Payment attempt started. TransactionId={}",
+                request.transactionId());
+
         Transaction transaction = transactionRepository.findById(
                 UUID.fromString(request.transactionId()))
                 .orElseThrow(() ->
                         new IllegalArgumentException("Transaction not found"));
 
-        CardHolder cardHolder = cardHolderRepository.findByPan(request.pan().replaceAll("\\s+", ""))
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Card not found: " + request));
-                        
+        CardHolder cardHolder = cardHolderRepository
+                .findByPanEncrypted(hashPan(request.pan()))
+                .orElseThrow(() -> {
+
+                    log.warn("Card lookup failed");
+
+                    return new IllegalArgumentException("Card not found");
+                });
+        
+        log.info(
+            "Card lookup successful. CardHolderId={}",
+            cardHolder.getId()
+        );
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
 
         YearMonth cardExpiry = YearMonth.parse(request.expiryDate(), formatter);
@@ -78,9 +107,16 @@ public class TransactionService {
 
         boolean notExpired = !cardExpiry.isBefore(now);
 
+        String expectedCvv = generateExpectedCvv(
+                request.pan(),
+                request.expiryDate()
+        );
+
+        boolean validCvv = expectedCvv.equals(request.securityCode());
+
         boolean validCard =
                 cardHolder.isActive()
-                && cardHolder.getSecurityCode().equals(request.securityCode())
+                && validCvv
                 && cardHolder.getExpiryDate().equals(request.expiryDate())
                 && cardHolder.getFullName().equalsIgnoreCase(request.cardHolderName())
                 && notExpired;
@@ -102,10 +138,23 @@ public class TransactionService {
 
             status = "SUCCESS";
 
+            log.info(
+                "Payment SUCCESS. TransactionId={}, Amount={}",
+                transaction.getId(),
+                transaction.getAmount()
+            );
+
         } else {
             transaction.setPaymentStatus(PaymentStatus.FAILED);
 
             status = "FAILED";
+
+            log.warn(
+                "Payment FAILED. TransactionId={}, ValidCard={}, HasFunds={}",
+                transaction.getId(),
+                validCard,
+                hasFunds
+            );
         }
 
         transactionRepository.save(transaction);
@@ -127,8 +176,54 @@ public class TransactionService {
         );
     }
 
+    private String hashPan(String pan) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(pan.replaceAll("\\s+", "").getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not available", e);
+        }
+    }
+
     public String sendNotification(Map<String, String> payload) {
         String pspUrl = "http://payment-provider-backend:8080/payments/card/bank-card";
         return restTemplate.postForObject(pspUrl, payload, String.class);
+    }
+
+    private String generateExpectedCvv(String pan, String expiry) {
+        try {
+            String data = pan.replaceAll("\\s+", "") + "|" + expiry;
+
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec keySpec = new SecretKeySpec(
+                    CVK_SECRET.getBytes(StandardCharsets.UTF_8),
+                    "HmacSHA256"
+            );
+
+            mac.init(keySpec);
+
+            byte[] rawHmac = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+
+            int value = ((rawHmac[0] & 0xFF) << 24)
+                    | ((rawHmac[1] & 0xFF) << 16)
+                    | ((rawHmac[2] & 0xFF) << 8)
+                    | (rawHmac[3] & 0xFF);
+
+            value = Math.abs(value);
+
+            return String.format("%03d", value % 1000);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

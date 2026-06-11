@@ -13,8 +13,8 @@ public class CardHolderService {
 
     private final CardHolderRepository repository;
 
-    public CardHolder findByPan(String pan) {
-        return repository.findByPan(pan)
+    public CardHolder findByPanEncrypted(String panEncrypted) {
+        return repository.findByPanEncrypted(panEncrypted)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Card not found"));
     }

@@ -30,9 +30,8 @@ CREATE TABLE IF NOT EXISTS transactions (
 CREATE TABLE IF NOT EXISTS card_holders (
     id BINARY(16) PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
-    pan VARCHAR(32) NOT NULL UNIQUE,
+    pan_encrypted VARCHAR(64) NOT NULL UNIQUE,
     expiry_date VARCHAR(10) NOT NULL,
-    security_code VARCHAR(10) NOT NULL,
     balance DECIMAL(19,2) NOT NULL,
     active BOOLEAN DEFAULT TRUE
 );
@@ -53,30 +52,29 @@ VALUES (
 INSERT INTO card_holders (
     id,
     full_name,
-    pan,
+    pan_encrypted,
     expiry_date,
-    security_code,
     balance,
     active
 )
 VALUES (
     UUID_TO_BIN(UUID()),
     'Petar Petrovic',
-    '5186001700008785',
+    'f0473703743fdad62dea9f70437c158691bcdbf67e443403b8764520274bca3f',
     '12/30',
-    '123',
     1000000.00,
     1
 ),
 (
     UUID_TO_BIN(UUID()),
     'Marko Markovic',
-    '5186001700009726',
+    '8a66f48b3589dfada2d2895ea9d1e858c9baa1e64f81f98f156e761493052327',
     '10/29',
-    '456',
     5.00,
     1
 );
+-- Broj Kartice Petra: 5186001700008785, CV: 787
+-- Broj Kartice Marka: 5186001700009726, CV: 998
 
 USE `payment-provider`;
 

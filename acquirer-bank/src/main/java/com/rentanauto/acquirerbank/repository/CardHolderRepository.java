@@ -12,5 +12,5 @@ import com.rentanauto.acquirerbank.domain.CardHolder;
 public interface CardHolderRepository
         extends JpaRepository<CardHolder, UUID> {
 
-    Optional<CardHolder> findByPan(String pan);
+    Optional<CardHolder> findByPanEncrypted(String panEncrypted);
 }

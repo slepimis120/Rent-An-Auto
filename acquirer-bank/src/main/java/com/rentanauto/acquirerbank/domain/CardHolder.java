@@ -25,11 +25,9 @@ public class CardHolder {
     private String fullName;
 
     @Column(unique = true)
-    private String pan;
+    private String panEncrypted;
 
     private String expiryDate;
-
-    private String securityCode;
 
     private BigDecimal balance;
 

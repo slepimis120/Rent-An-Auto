@@ -3,6 +3,8 @@ package com.rentauto.paymentprovider.service;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.rentauto.paymentprovider.api.dto.PaymentInitRequest;
@@ -23,10 +25,20 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final MerchantRepository merchantRepository;
     private final BankClient bankClient;
+    private static final Logger log =
+        LoggerFactory.getLogger(TransactionService.class);
 
     public Transaction initPaymentProcess(PaymentInitRequest request, PaymentMethod method) {
         Merchant merchant = merchantRepository.findByMerchantApiKey(request.merchantApiKey())
                 .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
+
+        log.info(
+            "Payment initiated. Merchant={}, Amount={}, Currency={}, Method={}",
+            merchant.getId(),
+            request.amount(),
+            request.currency(),
+            method
+        );
 
         Transaction tx = new Transaction();
         tx.setMerchant(merchant);
@@ -53,13 +65,25 @@ public class TransactionService {
         try {
             TransactionCreateResponse bankResponse = bankClient.create(bankRequest);
 
+            log.info(
+                "Bank transaction created. ExternalTransactionId={}",
+                bankResponse.payment_id()
+            );
+
             tx.setExternalTransactionId(bankResponse.payment_id());
             tx.setPaymentUrl(bankResponse.payment_url());
 
             return transactionRepository.save(tx);
         } catch (Exception e) {
+            log.error(
+                "Bank communication failed. TransactionId={}",
+                tx.getId(),
+                e
+            );
+            
             tx.setPaymentStatus(PaymentStatus.ERROR);
             transactionRepository.save(tx);
+
             throw new RuntimeException("Bank service communication failed: " + e.getMessage());
         }
     }
