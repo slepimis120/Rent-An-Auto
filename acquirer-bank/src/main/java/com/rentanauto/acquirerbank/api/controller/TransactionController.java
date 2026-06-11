@@ -8,7 +8,6 @@ import com.rentanauto.acquirerbank.domain.Transaction;
 import com.rentanauto.acquirerbank.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

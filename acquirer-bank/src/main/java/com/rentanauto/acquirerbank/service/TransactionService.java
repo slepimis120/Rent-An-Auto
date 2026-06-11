@@ -1,26 +1,33 @@
 package com.rentanauto.acquirerbank.service;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import com.rentanauto.acquirerbank.api.dto.CardPaymentRequest;
 import com.rentanauto.acquirerbank.api.dto.CardPaymentResponse;
 import com.rentanauto.acquirerbank.api.dto.TransactionCreateRequest;
 import com.rentanauto.acquirerbank.api.dto.TransactionCreateResponse;
+import com.rentanauto.acquirerbank.domain.CardHolder;
 import com.rentanauto.acquirerbank.domain.PaymentStatus;
 import com.rentanauto.acquirerbank.domain.Transaction;
+import com.rentanauto.acquirerbank.repository.CardHolderRepository;
 import com.rentanauto.acquirerbank.repository.TransactionRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class TransactionService {
     private final TransactionRepository transactionRepository;
+    private final CardHolderRepository cardHolderRepository;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public TransactionCreateResponse createTransaction(TransactionCreateRequest request) {
@@ -54,12 +61,53 @@ public class TransactionService {
     }
 
     public CardPaymentResponse processPayment(CardPaymentRequest request) {
-        Transaction transaction = transactionRepository.findById(UUID.fromString(request.transactionId()))
-                .orElseThrow(() -> new IllegalArgumentException("Transakcija nije pronađena"));
 
-        boolean hasFunds = !request.pan().endsWith("0");
-        String status = hasFunds ? "SUCCESS" : "FAILED";
-        transaction.setPaymentStatus(hasFunds ? PaymentStatus.SUCCESS : PaymentStatus.FAILED);
+        Transaction transaction = transactionRepository.findById(
+                UUID.fromString(request.transactionId()))
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Transaction not found"));
+
+        CardHolder cardHolder = cardHolderRepository.findByPan(request.pan().replaceAll("\\s+", ""))
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Card not found: " + request));
+                        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+
+        YearMonth cardExpiry = YearMonth.parse(request.expiryDate(), formatter);
+        YearMonth now = YearMonth.now();
+
+        boolean notExpired = !cardExpiry.isBefore(now);
+
+        boolean validCard =
+                cardHolder.isActive()
+                && cardHolder.getSecurityCode().equals(request.securityCode())
+                && cardHolder.getExpiryDate().equals(request.expiryDate())
+                && cardHolder.getFullName().equalsIgnoreCase(request.cardHolderName())
+                && notExpired;
+
+        boolean hasFunds =
+                cardHolder.getBalance()
+                        .compareTo(transaction.getAmount()) >= 0;
+
+        String status;
+
+        if (validCard && hasFunds) {
+            cardHolder.setBalance(
+                    cardHolder.getBalance()
+                            .subtract(transaction.getAmount()));
+
+            cardHolderRepository.save(cardHolder);
+
+            transaction.setPaymentStatus(PaymentStatus.SUCCESS);
+
+            status = "SUCCESS";
+
+        } else {
+            transaction.setPaymentStatus(PaymentStatus.FAILED);
+
+            status = "FAILED";
+        }
+
         transactionRepository.save(transaction);
 
         Map<String, String> pspPayload = new HashMap<>();
@@ -68,7 +116,7 @@ public class TransactionService {
         pspPayload.put("globalTransactionId", transaction.getId().toString());
         pspPayload.put("acquirerTimestamp", transaction.getAcquirerTimestamp());
 
-        String finalRedirectUrlFromPsp = this.sendNotification(pspPayload);
+        String finalRedirectUrlFromPsp = sendNotification(pspPayload);
 
         return new CardPaymentResponse(
                 status,
@@ -83,5 +131,4 @@ public class TransactionService {
         String pspUrl = "http://payment-provider-backend:8080/payments/card/bank-card";
         return restTemplate.postForObject(pspUrl, payload, String.class);
     }
-
 }

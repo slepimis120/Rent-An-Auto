@@ -25,10 +25,14 @@ export class CardPaymentComponent implements OnInit, OnDestroy {
   timeLeft = '15:00';
   private timerSeconds = 900;
   private timerInterval: any;
+  cvvInvalid = true;
+  expiryInvalid = true;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
+    this.validateCvv();
+    this.validateExpiry();
     if (this.transactionData && this.transactionData.acquirerTimestamp) {
       this.calculateRemainingTime(this.transactionData.acquirerTimestamp);
     } else {
@@ -120,11 +124,13 @@ export class CardPaymentComponent implements OnInit, OnDestroy {
 
     this.paymentData.expiryDate = formattedValue;
     event.target.value = formattedValue;
+
+    this.validateExpiry();
   }
 
 
   submitPayment() {
-    if (this.panInvalid || this.timeExpired) return;
+    if (this.panInvalid || this.timeExpired || this.cvvInvalid || this.expiryInvalid) return;
 
     const payload = {
       ...this.paymentData,
@@ -140,6 +146,37 @@ export class CardPaymentComponent implements OnInit, OnDestroy {
         alert('Došlo je do greške prilikom obrade kartice.');
       }
     });
+  }
+
+  validateCvv() {
+    const cvv = this.paymentData.securityCode.replace(/\D/g, '');
+    this.cvvInvalid = cvv.length !== 3;
+  }
+
+  validateExpiry() {
+    const value = this.paymentData.expiryDate;
+
+    if (!value || value.length !== 5 || !value.includes('/')) {
+      this.expiryInvalid = true;
+      return;
+    }
+
+    const [mm, yy] = value.split('/');
+    const month = parseInt(mm, 10);
+    const year = parseInt('20' + yy, 10);
+
+    if (month < 1 || month > 12) {
+      this.expiryInvalid = true;
+      return;
+    }
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    this.expiryInvalid =
+      year < currentYear ||
+      (year === currentYear && month < currentMonth);
   }
 
   ngOnDestroy() {

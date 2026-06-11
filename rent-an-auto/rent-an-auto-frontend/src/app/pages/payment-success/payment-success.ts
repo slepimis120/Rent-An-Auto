@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ChangeDetectorRef } from '@angular/core';
+
 @Component({
   selector: 'app-payment-success',
   standalone: false,
   templateUrl: './payment-success.html',
   styleUrl: './payment-success.css',
 })
-export class PaymentSuccess {
+export class PaymentSuccess implements OnInit {
 
   paymentId!: string | null;
   payment: any;
@@ -16,7 +18,8 @@ export class PaymentSuccess {
 
   constructor(
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -28,10 +31,12 @@ export class PaymentSuccess {
 
   loadPayment() {
     this.http
-      .get<any>(`http://localhost:8080/payments/${this.paymentId}`)
+      .get<any>(`http://localhost:8080/payments/external/${this.paymentId}`)
       .subscribe(res => {
         this.payment = res;
         this.loading = false;
+
+        this.cdr.detectChanges();
 
         if (this.payment.paymentStatus === 'SUCCESS') {
           this.createReservation();
@@ -62,6 +67,7 @@ export class PaymentSuccess {
       .subscribe(() => {
         this.reservationCreated = true;
         localStorage.removeItem('pendingReservation');
+        this.cdr.detectChanges();
       });
   }
 

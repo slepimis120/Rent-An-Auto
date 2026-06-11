@@ -25,10 +25,58 @@ CREATE TABLE IF NOT EXISTS transactions (
     acquirer_timestamp VARCHAR(255),
     payment_url VARCHAR(255),
     payment_status VARCHAR(50)
-    );
+);
 
-INSERT INTO merchants (id, name, merchant_api_key, is_active)
-VALUES (UUID_TO_BIN(UUID()), 'Rent An Auto', 'GqcexvV7aTS0ekMCoULOOovruWz9S3eE', 1);
+CREATE TABLE IF NOT EXISTS card_holders (
+    id BINARY(16) PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    pan VARCHAR(32) NOT NULL UNIQUE,
+    expiry_date VARCHAR(10) NOT NULL,
+    security_code VARCHAR(10) NOT NULL,
+    balance DECIMAL(19,2) NOT NULL,
+    active BOOLEAN DEFAULT TRUE
+);
+
+INSERT INTO merchants (
+    id,
+    name,
+    merchant_api_key,
+    is_active
+)
+VALUES (
+    UUID_TO_BIN(UUID()),
+    'Rent An Auto',
+    'GqcexvV7aTS0ekMCoULOOovruWz9S3eE',
+    1
+);
+
+INSERT INTO card_holders (
+    id,
+    full_name,
+    pan,
+    expiry_date,
+    security_code,
+    balance,
+    active
+)
+VALUES (
+    UUID_TO_BIN(UUID()),
+    'Petar Petrovic',
+    '5186001700008785',
+    '12/30',
+    '123',
+    1000000.00,
+    1
+),
+(
+    UUID_TO_BIN(UUID()),
+    'Marko Markovic',
+    '5186001700009726',
+    '10/29',
+    '456',
+    5.00,
+    1
+);
 
 USE `payment-provider`;
 
@@ -77,9 +125,9 @@ VALUES (
        '$2a$10$Vm9HNXN8k2AMjQr.S3G4r.9JArHoUSqKkkCblaZ67q2m440EY8jNq',
        'ROLE_MERCHANT',
        'Rent-A-Car Global',
-       'http://localhost:4200/payment/success',
-       'http://localhost:4200/payment/failed',
-       'http://localhost:4200/payment/error',
+       'http://localhost:4301/payment/success',
+       'http://localhost:4301/payment/failed',
+       'http://localhost:4301/payment/error',
        'GqcexvV7aTS0ekMCoULOOovruWz9S3eE'
 );
 

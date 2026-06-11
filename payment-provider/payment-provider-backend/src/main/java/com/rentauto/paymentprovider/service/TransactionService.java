@@ -1,5 +1,10 @@
 package com.rentauto.paymentprovider.service;
 
+import java.time.Instant;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
 import com.rentauto.paymentprovider.api.dto.PaymentInitRequest;
 import com.rentauto.paymentprovider.api.dto.TransactionCreateRequest;
 import com.rentauto.paymentprovider.api.dto.TransactionCreateResponse;
@@ -9,11 +14,8 @@ import com.rentauto.paymentprovider.domain.PaymentStatus;
 import com.rentauto.paymentprovider.domain.Transaction;
 import com.rentauto.paymentprovider.repository.MerchantRepository;
 import com.rentauto.paymentprovider.repository.TransactionRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -73,6 +75,11 @@ public class TransactionService {
 
     public Transaction getTransactionById(String id) {
         return transactionRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+    }
+
+    public Transaction getTransactionByExternalId(String externalId) {
+        return transactionRepository.findByExternalTransactionId(externalId)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
 
