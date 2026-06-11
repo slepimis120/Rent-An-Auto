@@ -14,6 +14,7 @@ export class HomePage implements OnInit {
 
   private vehicles$ = new BehaviorSubject<any[]>([]);
   private reservations$ = new BehaviorSubject<any[]>([]);
+  availablePaymentMethods: string[] = [];
 
   search$ = new BehaviorSubject<string>('');
   city$ = new BehaviorSubject<string>('');
@@ -104,6 +105,22 @@ export class HomePage implements OnInit {
     this.http
       .get<any[]>('http://127.0.0.1:8000/api/reservations/', { headers })
       .subscribe(r => this.reservations$.next(r));
+
+    const merchantId = 'fb440d26-f064-11f0-b818-b262890194ad';
+
+    this.http
+      .get<string[]>(
+        `http://localhost:8080/merchants/paymentMethods/${merchantId}`
+      )
+      .subscribe({
+        next: (res) => {
+          this.availablePaymentMethods = res;
+          console.log('Payment methods:', res);
+        },
+        error: (err) => {
+          console.error('Failed to fetch payment methods', err);
+        }
+      });
   }
 
   openPayment(vehicle: any) {

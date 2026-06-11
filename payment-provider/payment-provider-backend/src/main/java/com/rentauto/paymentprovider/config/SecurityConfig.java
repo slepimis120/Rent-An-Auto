@@ -1,6 +1,7 @@
 package com.rentauto.paymentprovider.config;
 
-import com.rentauto.paymentprovider.filter.JwtAuthFilter;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.List;
+import com.rentauto.paymentprovider.filter.JwtAuthFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -46,7 +47,7 @@ public class SecurityConfig {
                 }))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register", "/payments/**").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register", "/payments/**", "/merchants/paymentMethods/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

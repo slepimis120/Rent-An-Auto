@@ -9,20 +9,11 @@
 </div>
 
 <div class="filter-panel">
-  <input
-    placeholder="Search (BMW, Audi...)"
-    (input)="search$.next($any($event.target).value)"
-  />
+  <input placeholder="Search (BMW, Audi...)" (input)="search$.next($any($event.target).value)" />
 
-  <input
-    placeholder="City"
-    (input)="city$.next($any($event.target).value)"
-  />
+  <input placeholder="City" (input)="city$.next($any($event.target).value)" />
 
-  <input
-    placeholder="Brand"
-    (input)="brand$.next($any($event.target).value)"
-  />
+  <input placeholder="Brand" (input)="brand$.next($any($event.target).value)" />
 
   <select (change)="ordering$.next($any($event.target).value)">
     <option value="">Sort</option>
@@ -44,9 +35,7 @@
     <p><strong>Year:</strong> {{ v.year }}</p>
     <p class="price">{{ v.price_per_day }} € / day</p>
 
-    <button class="reserve-btn" (click)="openPayment(v)">
-      Reserve
-    </button>
+    <button class="reserve-btn" (click)="openPayment(v)">Reserve</button>
   </div>
 </div>
 
@@ -55,8 +44,17 @@
   <div class="payment-modal">
     <h3>Choose payment method</h3>
 
-    <button (click)="pay('CARD')">💳 Pay by Card</button>
-    <button (click)="pay('QR')">📱 Pay with QR</button>
+    @if (availablePaymentMethods.includes('CARD')) {
+      <button (click)="pay('CARD')">
+        💳 Pay by Card
+      </button>
+    }
+
+    @if (availablePaymentMethods.includes('QR_CODE')) {
+      <button (click)="pay('QR')">
+        📱 Pay with QR
+      </button>
+    }
 
     <button class="close" (click)="closePayment()">Cancel</button>
   </div>

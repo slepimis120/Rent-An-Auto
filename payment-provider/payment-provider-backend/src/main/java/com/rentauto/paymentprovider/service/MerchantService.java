@@ -10,6 +10,7 @@ import com.rentauto.paymentprovider.api.dto.RegisterRequest;
 import com.rentauto.paymentprovider.api.dto.RegisterResponse;
 import com.rentauto.paymentprovider.api.mapper.MerchantMapper;
 import com.rentauto.paymentprovider.domain.Merchant;
+import com.rentauto.paymentprovider.domain.PaymentMethod;
 import com.rentauto.paymentprovider.domain.User;
 import com.rentauto.paymentprovider.repository.MerchantRepository;
 
@@ -101,5 +102,11 @@ public class MerchantService {
     public Merchant getByEmail(String email) {
         return repository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
+    }
+
+    public List<PaymentMethod> getMerchantPaymentMethods(UUID id) {
+        Merchant merchant = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Merchant not found"));
+        return merchant.getEnabledPaymentMethods().stream().toList();
     }
 }
