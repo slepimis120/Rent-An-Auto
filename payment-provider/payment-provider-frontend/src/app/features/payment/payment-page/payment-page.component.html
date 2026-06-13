@@ -9,8 +9,9 @@
     </div>
 
     <div *ngSwitchCase="'QR_CODE'">
-      <h3>QR Payment</h3>
-      <p>Scan to pay {{ transaction.amount }} {{ transaction.currency }}</p>
+      <app-qr-payment
+        [transactionData]="transaction">
+      </app-qr-payment>
     </div>
 
     <div *ngSwitchDefault>

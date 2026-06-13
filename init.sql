@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS merchants (
     id BINARY(16) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     merchant_api_key VARCHAR(255) NOT NULL UNIQUE,
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
+    account_number VARCHAR(34) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS transactions (
@@ -40,13 +41,15 @@ INSERT INTO merchants (
     id,
     name,
     merchant_api_key,
-    is_active
+    is_active,
+    account_number
 )
 VALUES (
     UUID_TO_BIN(UUID()),
     'Rent An Auto',
     'GqcexvV7aTS0ekMCoULOOovruWz9S3eE',
-    1
+    1,
+    '840000000095584510'
 );
 
 INSERT INTO card_holders (
@@ -88,7 +91,8 @@ CREATE TABLE IF NOT EXISTS users (
     success_url VARCHAR(255),
     failed_url VARCHAR(255),
     error_url VARCHAR(255),
-    merchant_api_key VARCHAR(255) UNIQUE
+    merchant_api_key VARCHAR(255) UNIQUE,
+    account_number VARCHAR(34) NOT NULL
     );
 
 CREATE TABLE IF NOT EXISTS transactions (
@@ -115,18 +119,19 @@ CREATE TABLE IF NOT EXISTS merchant_payment_methods (
 
 SET @merchant_id = 'fb440d26-f064-11f0-b818-b262890194ad';
 
-INSERT INTO users (id, type, email, password, role, name, success_url, failed_url, error_url, merchant_api_key)
+INSERT INTO users (id, type, email, password, role, name, success_url, failed_url, error_url, merchant_api_key, account_number)
 VALUES (
-       UUID_TO_BIN(@merchant_id),
-       'MERCHANT',
-       'vlasnik@rentacar.com',
-       '$2a$10$Vm9HNXN8k2AMjQr.S3G4r.9JArHoUSqKkkCblaZ67q2m440EY8jNq',
-       'ROLE_MERCHANT',
-       'Rent-A-Car Global',
-       'http://localhost:4301/payment/success',
-       'http://localhost:4301/payment/failed',
-       'http://localhost:4301/payment/error',
-       'GqcexvV7aTS0ekMCoULOOovruWz9S3eE'
+        UUID_TO_BIN(@merchant_id),
+        'MERCHANT',
+        'vlasnik@rentacar.com',
+        '$2a$10$Vm9HNXN8k2AMjQr.S3G4r.9JArHoUSqKkkCblaZ67q2m440EY8jNq',
+        'ROLE_MERCHANT',
+        'Rent-A-Car Global',
+        'http://localhost:4301/payment/success',
+        'http://localhost:4301/payment/failed',
+        'http://localhost:4301/payment/error',
+        'GqcexvV7aTS0ekMCoULOOovruWz9S3eE',
+        '840000000095584510'
 );
 
 INSERT INTO merchant_payment_methods (merchant_id, enabled_payment_methods)

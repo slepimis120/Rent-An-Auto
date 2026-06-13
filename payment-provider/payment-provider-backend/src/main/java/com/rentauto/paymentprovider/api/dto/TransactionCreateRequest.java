@@ -5,6 +5,7 @@ public record TransactionCreateRequest (
         String amount,
         String currency,
         String stan,
-        String psp_timestamp
+        String psp_timestamp,
+        String paymentMethod
 ){
 }

@@ -20,6 +20,7 @@ public class MerchantService {
         merchant.setName(request.name());
         merchant.setActive(true);
         merchant.setMerchantApiKey(UUID.randomUUID().toString());
+        merchant.setAccountNumber(request.accountNumber());
 
         Merchant saved = repository.save(merchant);
 
@@ -27,7 +28,8 @@ public class MerchantService {
                 saved.getMerchantId(),
                 saved.getName(),
                 saved.getMerchantApiKey(),
-                saved.isActive()
+                saved.isActive(),
+                saved.getAccountNumber()
         );
     }
 
@@ -39,7 +41,8 @@ public class MerchantService {
                 merchant.getMerchantId(),
                 merchant.getName(),
                 merchant.getMerchantApiKey(),
-                merchant.isActive()
+                merchant.isActive(),
+                merchant.getAccountNumber()
         );
     }
 

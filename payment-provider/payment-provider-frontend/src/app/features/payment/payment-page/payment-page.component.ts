@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import {CardPaymentComponent} from '../card-payment/card-payment.component';
+import { QrPaymentComponent } from '../qr-payment/qr-payment.component';
 
 @Component({
   selector: 'app-payment-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardPaymentComponent],
+  imports: [CommonModule, FormsModule, CardPaymentComponent, QrPaymentComponent],
   templateUrl: './payment-page.component.html',
   styleUrls: ['./payment-page.component.css']
 })
@@ -43,7 +44,7 @@ export class PaymentPageComponent implements OnInit {
           const actualPspStan = segments[6];
 
           if (actualPspStan) {
-            this.fetchPspMethod(actualPspStan);
+            this.fetchPspMethod(segments[5] + "-" + segments[6]);
           } else {
             console.error('Could not extract PSP STAN from bank record');
             this.errorMessage = 'Invalid transaction format';

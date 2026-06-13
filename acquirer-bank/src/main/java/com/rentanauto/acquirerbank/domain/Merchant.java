@@ -24,4 +24,7 @@ public class Merchant {
 
     @Column(name = "is_active")
     private boolean isActive;
+
+    @Column(name = "account_number", nullable = false)
+    private String accountNumber;
 }

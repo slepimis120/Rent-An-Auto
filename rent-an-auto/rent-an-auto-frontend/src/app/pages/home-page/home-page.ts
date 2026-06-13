@@ -143,11 +143,14 @@ export class HomePage implements OnInit {
       paymentMethod: method
     };
 
-    this.http
-      .post<any>('http://localhost:8080/payments/card/process', body)
-      .subscribe(res => {
-        window.location.href = res.paymentUrl;
-      });
+    const url =
+      method === 'QR'
+        ? 'http://localhost:8080/payments/qr/process'
+        : 'http://localhost:8080/payments/card/process';
+
+    this.http.post<any>(url, body).subscribe(res => {
+      window.location.href = res.paymentUrl;
+    });
   }
 
   logout() {

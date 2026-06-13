@@ -34,4 +34,7 @@ public class Merchant extends User{
     @CollectionTable(name = "merchant_payment_methods", joinColumns = @JoinColumn(name = "merchant_id"))
     @Enumerated(EnumType.STRING)
     private Set<PaymentMethod> enabledPaymentMethods;
+
+    @Column(name = "account_number", nullable = false)
+    private String accountNumber;
 }

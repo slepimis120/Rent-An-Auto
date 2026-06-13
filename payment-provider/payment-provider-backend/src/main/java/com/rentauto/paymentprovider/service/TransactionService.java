@@ -37,7 +37,7 @@ public class TransactionService {
             merchant.getId(),
             request.amount(),
             request.currency(),
-            method
+            method.toString()
         );
 
         Transaction tx = new Transaction();
@@ -59,7 +59,8 @@ public class TransactionService {
                 request.amount().toString(),
                 request.currency(),
                 request.merchantId() + "-" + tx.getStan() + "-" + tx.getPspTimestamp(),
-                tx.getPspTimestamp().toString()
+                tx.getPspTimestamp().toString(),
+                method.toString()
         );
 
         try {
@@ -93,7 +94,7 @@ public class TransactionService {
     }
 
     public Transaction getTransaction(String stan) {
-        return transactionRepository.findByStan("STAN-" + stan)
+        return transactionRepository.findByStan(stan)
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
     }
 

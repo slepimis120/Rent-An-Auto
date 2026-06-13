@@ -7,6 +7,9 @@ import com.rentanauto.acquirerbank.api.dto.TransactionCreateResponse;
 import com.rentanauto.acquirerbank.domain.Transaction;
 import com.rentanauto.acquirerbank.service.TransactionService;
 import lombok.AllArgsConstructor;
+
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +35,15 @@ public class TransactionController {
     @PostMapping("/pay")
     public ResponseEntity<CardPaymentResponse> processPayment(@RequestBody CardPaymentRequest request) {
         return ResponseEntity.ok(service.processPayment(request));
+    }
+
+    @GetMapping("/{id}/qr-image")
+    public ResponseEntity<Map<String, String>> getQrImage(@PathVariable String id) {
+
+        Transaction tx = service.getTransactionById(id);
+
+        String qr = service.generateQrCode(tx);
+
+        return ResponseEntity.ok(Map.of("qrCode", qr));
     }
 }

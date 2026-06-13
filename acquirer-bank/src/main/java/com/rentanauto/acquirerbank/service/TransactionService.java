@@ -1,5 +1,8 @@
 package com.rentanauto.acquirerbank.service;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -7,18 +10,26 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.rentanauto.acquirerbank.api.dto.CardPaymentRequest;
 import com.rentanauto.acquirerbank.api.dto.CardPaymentResponse;
 import com.rentanauto.acquirerbank.api.dto.TransactionCreateRequest;
@@ -40,13 +51,13 @@ public class TransactionService {
     private static final String CVK_SECRET = "secret-bank-key";
     private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
 
-
     public TransactionCreateResponse createTransaction(TransactionCreateRequest request) {
         log.info(
             "Transaction created. MerchantId={}, Amount={}",
             request.merchantId(),
             request.amount()
         );
+        
         Transaction existing = transactionRepository.findByStan(request.stan());
         if (existing != null) {
             return new TransactionCreateResponse(existing.getPaymentUrl(), existing.getId().toString());
@@ -64,6 +75,7 @@ public class TransactionService {
         transaction = transactionRepository.save(transaction);
 
         String paymentUrl = "http://localhost:4300/pay/" + transaction.getId();
+        
         transaction.setPaymentUrl(paymentUrl);
 
         transactionRepository.save(transaction);
@@ -224,6 +236,27 @@ public class TransactionService {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public String generateQrCode(Transaction tx) {
+        try{
+            String qrText = "PAYMENT:" + tx.getId() + ":" + tx.getStan() + ":" + tx.getAmount();
+
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            Map<EncodeHintType, Object> hints = new HashMap<>();
+            hints.put(EncodeHintType.MARGIN, 1);
+
+            BitMatrix bitMatrix = qrCodeWriter.encode(qrText, BarcodeFormat.QR_CODE, 250, 250, hints);
+            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(qrImage, "PNG", baos);
+
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(baos.toByteArray());
+
+        } catch (WriterException | IOException e){
+            throw new RuntimeException("Failed to generate QR Code", e);
         }
     }
 }

@@ -1,0 +1,29 @@
+<div class="container" *ngIf="transactionData">
+
+  <h1>QR Sigurno plaćanje</h1>
+
+  <div class="amount-box">
+    <label>Iznos za uplatu</label>
+    <div class="price">
+      {{ transactionData.amount | currency: transactionData.currency }}
+    </div>
+    <small style="color: #6b7280">ID: {{ transactionData.id }}</small>
+  </div>
+
+  <div class="qr-box">
+    <img
+      [src]="qrCode"
+      alt="QR Code"
+      *ngIf="qrCode"
+    />
+
+    <p *ngIf="!qrCode">
+      Generisanje QR koda...
+    </p>
+  </div>
+
+  <div class="info-box">
+    <p>Skeniraj QR kod da izvršiš plaćanje</p>
+  </div>
+
+</div>

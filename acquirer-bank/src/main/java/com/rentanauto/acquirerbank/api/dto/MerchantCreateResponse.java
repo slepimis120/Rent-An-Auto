@@ -6,5 +6,6 @@ public record MerchantCreateResponse(
         UUID merchantId,
         String name,
         String merchantApiKey,
-        boolean isActive
+        boolean isActive,
+        String accountNumber
 ) {}

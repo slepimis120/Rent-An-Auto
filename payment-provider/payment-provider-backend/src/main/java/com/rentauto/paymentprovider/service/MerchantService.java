@@ -37,8 +37,8 @@ public class MerchantService {
         merchant.setEmail(request.email());
         merchant.setPassword(passwordEncoder.encode(request.password()));
         merchant.setRole(User.Role.ROLE_MERCHANT);
-
         merchant.setMerchantApiKey(UUID.randomUUID().toString());
+        merchant.setAccountNumber(request.accountNumber());
 
         Merchant savedMerchant = repository.save(merchant);
 
@@ -89,6 +89,10 @@ public class MerchantService {
 
         if(updatedMerchant.getMerchantApiKey() != null){
             existingMerchant.setMerchantApiKey(updatedMerchant.getMerchantApiKey());
+        }
+
+        if(updatedMerchant.getAccountNumber() != null){
+            existingMerchant.setAccountNumber(updatedMerchant.getAccountNumber());
         }
 
         return repository.save(existingMerchant);

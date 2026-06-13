@@ -1,7 +1,11 @@
 package com.rentauto.paymentprovider.plugins.qr;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +28,16 @@ public class QrCodePaymentController {
     public ResponseEntity<PaymentInitResponse> processQrPayment(@RequestBody PaymentInitRequest request) {
         PaymentInitResponse tx = qrPlugin.processPayment(request);
         return ResponseEntity.ok(tx);
+    }
+
+    @GetMapping("/{stan}")
+    public ResponseEntity<Map<String, String>> getQr(@PathVariable String stan) {
+
+        String qr = qrPlugin.generateQr(stan);
+
+        return ResponseEntity.ok(Map.of(
+                "method", "QR_CODE",
+                "qrCode", qr
+        ));
     }
 }
