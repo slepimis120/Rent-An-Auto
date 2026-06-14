@@ -40,4 +40,10 @@ public class QrCodePaymentController {
                 "qrCode", qr
         ));
     }
+
+    @PostMapping("/callback")
+    public ResponseEntity<String> qrCallback(@RequestBody Map<String, String> payload) {
+        String redirect = qrPlugin.handleCallback(payload);
+        return ResponseEntity.ok(redirect);
+    }
 }

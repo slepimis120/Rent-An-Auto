@@ -47,8 +47,7 @@ public class SecurityConfig {
                 }))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register", "/payments/**", "/merchants/paymentMethods/**").permitAll()
-
+                        .requestMatchers("/auth/login", "/auth/register", "/payments/**", "/merchants/paymentMethods/**", "/ws", "/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

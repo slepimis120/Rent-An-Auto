@@ -53,11 +53,10 @@ public class TransactionService {
 
     public TransactionCreateResponse createTransaction(TransactionCreateRequest request) {
         log.info(
-            "Transaction created. MerchantId={}, Amount={}",
-            request.merchantId(),
-            request.amount()
-        );
-        
+                "Transaction created. MerchantId={}, Amount={}",
+                request.merchantId(),
+                request.amount());
+
         Transaction existing = transactionRepository.findByStan(request.stan());
         if (existing != null) {
             return new TransactionCreateResponse(existing.getPaymentUrl(), existing.getId().toString());
@@ -75,7 +74,7 @@ public class TransactionService {
         transaction = transactionRepository.save(transaction);
 
         String paymentUrl = "http://localhost:4300/pay/" + transaction.getId();
-        
+
         transaction.setPaymentUrl(paymentUrl);
 
         transactionRepository.save(transaction);
@@ -95,8 +94,7 @@ public class TransactionService {
 
         Transaction transaction = transactionRepository.findById(
                 UUID.fromString(request.transactionId()))
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Transaction not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
         CardHolder cardHolder = cardHolderRepository
                 .findByPanEncrypted(hashPan(request.pan()))
@@ -106,11 +104,10 @@ public class TransactionService {
 
                     return new IllegalArgumentException("Card not found");
                 });
-        
+
         log.info(
-            "Card lookup successful. CardHolderId={}",
-            cardHolder.getId()
-        );
+                "Card lookup successful. CardHolderId={}",
+                cardHolder.getId());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
 
@@ -121,21 +118,18 @@ public class TransactionService {
 
         String expectedCvv = generateExpectedCvv(
                 request.pan(),
-                request.expiryDate()
-        );
+                request.expiryDate());
 
         boolean validCvv = expectedCvv.equals(request.securityCode());
 
-        boolean validCard =
-                cardHolder.isActive()
+        boolean validCard = cardHolder.isActive()
                 && validCvv
                 && cardHolder.getExpiryDate().equals(request.expiryDate())
                 && cardHolder.getFullName().equalsIgnoreCase(request.cardHolderName())
                 && notExpired;
 
-        boolean hasFunds =
-                cardHolder.getBalance()
-                        .compareTo(transaction.getAmount()) >= 0;
+        boolean hasFunds = cardHolder.getBalance()
+                .compareTo(transaction.getAmount()) >= 0;
 
         String status;
 
@@ -151,10 +145,9 @@ public class TransactionService {
             status = "SUCCESS";
 
             log.info(
-                "Payment SUCCESS. TransactionId={}, Amount={}",
-                transaction.getId(),
-                transaction.getAmount()
-            );
+                    "Payment SUCCESS. TransactionId={}, Amount={}",
+                    transaction.getId(),
+                    transaction.getAmount());
 
         } else {
             transaction.setPaymentStatus(PaymentStatus.FAILED);
@@ -162,11 +155,10 @@ public class TransactionService {
             status = "FAILED";
 
             log.warn(
-                "Payment FAILED. TransactionId={}, ValidCard={}, HasFunds={}",
-                transaction.getId(),
-                validCard,
-                hasFunds
-            );
+                    "Payment FAILED. TransactionId={}, ValidCard={}, HasFunds={}",
+                    transaction.getId(),
+                    validCard,
+                    hasFunds);
         }
 
         transactionRepository.save(transaction);
@@ -184,8 +176,7 @@ public class TransactionService {
                 transaction.getId().toString(),
                 transaction.getAcquirerTimestamp(),
                 transaction.getStan(),
-                finalRedirectUrlFromPsp
-        );
+                finalRedirectUrlFromPsp);
     }
 
     private String hashPan(String pan) {
@@ -196,7 +187,8 @@ public class TransactionService {
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
+                if (hex.length() == 1)
+                    hexString.append('0');
                 hexString.append(hex);
             }
             return hexString.toString();
@@ -218,8 +210,7 @@ public class TransactionService {
             Mac mac = Mac.getInstance("HmacSHA256");
             SecretKeySpec keySpec = new SecretKeySpec(
                     CVK_SECRET.getBytes(StandardCharsets.UTF_8),
-                    "HmacSHA256"
-            );
+                    "HmacSHA256");
 
             mac.init(keySpec);
 
@@ -240,7 +231,7 @@ public class TransactionService {
     }
 
     public String generateQrCode(Transaction tx) {
-        try{
+        try {
             String qrText = "PAYMENT:" + tx.getId() + ":" + tx.getStan() + ":" + tx.getAmount();
 
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -255,8 +246,47 @@ public class TransactionService {
 
             return "data:image/png;base64," + Base64.getEncoder().encodeToString(baos.toByteArray());
 
-        } catch (WriterException | IOException e){
+        } catch (WriterException | IOException e) {
             throw new RuntimeException("Failed to generate QR Code", e);
+        }
+    }
+
+    public void processQrPayment(String transactionId) {
+
+        Transaction transaction = transactionRepository.findById(
+                UUID.fromString(transactionId))
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+
+        if (transaction.getPaymentStatus() == PaymentStatus.SUCCESS) {
+            return;
+        }
+
+        transaction.setPaymentStatus(PaymentStatus.SUCCESS);
+        transactionRepository.save(transaction);
+
+        log.info("QR payment SUCCESS {}", transaction.getId());
+
+        Map<String, String> pspPayload = new HashMap<>();
+
+        pspPayload.put("stan", transaction.getStan());
+        pspPayload.put("status", "SUCCESS");
+        pspPayload.put("globalTransactionId", transaction.getId().toString());
+        pspPayload.put("acquirerTimestamp", transaction.getAcquirerTimestamp());
+
+        sendQrNotification(pspPayload);
+    }
+
+    public void sendQrNotification(Map<String, String> payload) {
+
+        String pspUrl = "http://payment-provider-backend:8080/payments/qr/callback";
+
+        try {
+            restTemplate.postForObject(
+                    pspUrl,
+                    payload,
+                    String.class);
+        } catch (Exception ex) {
+            log.info("PSP notification skipped (dummy endpoint)");
         }
     }
 }

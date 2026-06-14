@@ -26,4 +26,23 @@
     <p>Skeniraj QR kod da izvršiš plaćanje</p>
   </div>
 
+<div
+    *ngIf="paymentStatus"
+    class="status-box"
+    [ngClass]="{
+      'status-success': paymentStatus === 'SUCCESS',
+      'status-failed': paymentStatus === 'FAILED'
+    }"
+  >
+    Status: {{ paymentStatus }}
+  </div>
+
+  <div class="actions">
+
+    <button (click)="simulatePayment()" class="btn btn-success">
+      Simuliraj uspešno plaćanje
+    </button>
+
+  </div>
+
 </div>

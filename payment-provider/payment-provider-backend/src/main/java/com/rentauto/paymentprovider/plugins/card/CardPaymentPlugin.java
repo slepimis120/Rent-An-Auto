@@ -33,7 +33,7 @@ public class CardPaymentPlugin implements PaymentPlugin {
         String globalId = params.get("globalTransactionId");
 
         String[] parts = fullStan.split("-");
-        String originalStan = parts[6];
+        String originalStan = parts[5] + "-" + parts[6];
 
         Transaction tx = transactionService.getTransaction(originalStan);
 

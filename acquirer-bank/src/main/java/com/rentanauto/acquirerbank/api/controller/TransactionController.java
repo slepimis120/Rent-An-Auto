@@ -46,4 +46,10 @@ public class TransactionController {
 
         return ResponseEntity.ok(Map.of("qrCode", qr));
     }
+
+    @PostMapping("/{id}/qr-pay")
+    public ResponseEntity<Void> processQrPayment(@PathVariable String id) {
+        service.processQrPayment(id);
+        return ResponseEntity.noContent().build();
+    }
 }

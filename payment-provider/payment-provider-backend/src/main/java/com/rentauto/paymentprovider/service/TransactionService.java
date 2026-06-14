@@ -95,7 +95,7 @@ public class TransactionService {
 
     public Transaction getTransaction(String stan) {
         return transactionRepository.findByStan(stan)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found:" + stan));
     }
 
     public Transaction getTransactionById(String id) {
